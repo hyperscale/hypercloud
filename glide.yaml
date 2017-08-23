@@ -1,0 +1,22 @@
+package: github.com/hyperscale/hyperpaas
+import:
+- package: github.com/spf13/viper
+- package: github.com/whitedevops/colors
+- package: github.com/stretchr/testify
+  version: ^1.1.4
+  subpackages:
+  - assert
+- package: github.com/rs/cors
+  version: ^1.0.0
+- package: github.com/euskadi31/go-service
+- package: github.com/gorilla/mux
+  version: ^1.4.0
+- package: github.com/justinas/alice
+  version: ^1.0.0
+- package: github.com/rs/zerolog
+  version: ^1.2.2
+  subpackages:
+  - log
+  - hlog
+- package: github.com/rs/xid
+  version: ^1.1.0
