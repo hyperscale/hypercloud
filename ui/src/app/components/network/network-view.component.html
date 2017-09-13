@@ -1,0 +1,61 @@
+
+<h3>Network details</h3>
+<table class="table table-vertical">
+    <tbody>
+        <tr>
+            <th>Name</th>
+            <td>{{ network.Name }}</td>
+        </tr>
+        <tr>
+            <th>ID</th>
+            <td>{{ network.Id }}</td>
+        </tr>
+        <tr>
+            <th>Driver</th>
+            <td>{{ network.Driver }}</td>
+        </tr>
+        <tr>
+            <th>Scope</th>
+            <td>{{ network.Scope }}</td>
+        </tr>
+        <tr *ngIf="network.IPAM?.Config[0]?.Subnet">
+            <th>Subnet</th>
+            <td>{{ network.IPAM.Config[0].Subnet }}</td>
+        </tr>
+        <tr *ngIf="network.IPAM?.Config[0]?.Gateway">
+            <th>Gateway</th>
+            <td>{{ network.IPAM.Config[0].Gateway }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3>Network options</h3>
+<table class="table table-vertical">
+    <tbody>
+        <tr *ngFor="let option of options">
+            <th>{{ option.name }}</th>
+            <td>{{ option.value }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3>Containers in network</h3>
+<clr-datagrid>
+    <clr-dg-column>Container Name</clr-dg-column>
+    <clr-dg-column>IPv4 Address</clr-dg-column>
+    <clr-dg-column>IPv6 Address</clr-dg-column>
+    <clr-dg-column>MacAddress</clr-dg-column>
+    <clr-dg-column>Actions</clr-dg-column>
+
+    <clr-dg-placeholder>There are no container labels for this node.</clr-dg-placeholder>
+
+    <clr-dg-row *ngFor="let container of containers">
+        <clr-dg-cell>{{ container.Name }}</clr-dg-cell>
+        <clr-dg-cell>{{ container.IPv4Address }}</clr-dg-cell>
+        <clr-dg-cell>{{ container.IPv6Address }}</clr-dg-cell>
+        <clr-dg-cell>{{ container.MacAddress }}</clr-dg-cell>
+        <clr-dg-cell><a href="#">Leave Network</a></clr-dg-cell>
+    </clr-dg-row>
+
+    <clr-dg-footer>{{ containers.length }} containers</clr-dg-footer>
+</clr-datagrid>

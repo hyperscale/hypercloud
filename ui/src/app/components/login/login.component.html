@@ -1,0 +1,16 @@
+<div class="login-wrapper">
+    <form class="login" (submit)="onSubmit()" #loginForm="ngForm">
+        <label class="title">
+            <h3 class="welcome">Welcome to</h3>
+            HyperPaaS
+        </label>
+        <div class="login-group">
+            <input class="username" required type="text" id="login_username" name="username" placeholder="Username" [(ngModel)]="login.username" #username="ngModel"/>
+            <input class="password" required type="password" id="login_password" name="password" placeholder="Password" [(ngModel)]="login.password" #password="ngModel"/>
+            <div class="error active" *ngIf="username.invalid && (username.dirty || username.touched) || password.invalid && (password.dirty || password.touched)">
+                Invalid user name or password
+            </div>
+            <button type="submit" class="btn btn-primary">Login</button>
+        </div>
+    </form>
+</div>

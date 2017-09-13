@@ -4,24 +4,20 @@
 
 package services
 
-import "github.com/rs/zerolog"
+import "github.com/rs/zerolog/log"
 
 // AppService struct
 type AppService struct {
-	log zerolog.Logger
 }
 
 // NewAppService constructor
-func NewAppService(log zerolog.Logger) *AppService {
-	return &AppService{
-		log: log,
-	}
+func NewAppService() *AppService {
+	return &AppService{}
 }
 
 // Run App
 func (s *AppService) Run() error {
-
-	s.log.Info().Msg("hello")
+	log.Info().Msg("hello")
 
 	return nil
 }

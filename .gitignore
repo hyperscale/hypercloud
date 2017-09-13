@@ -2,3 +2,5 @@
 vendor/
 *.out
 config.yml
+var/
+hyperpaas

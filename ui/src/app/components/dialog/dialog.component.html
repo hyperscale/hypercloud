@@ -1,0 +1,25 @@
+<div class="dialog-component" *ngIf="opened">
+    <div class="overlay" (click)="close()"></div>
+    <div class="dialog" role="dialog" [ngStyle]="{'width': width + 'px', 'margin-top': top + 'px'}">
+        <form>
+            <div class="header">
+                <div class="clearfix">
+                    <div class="close">
+                        <button tabindex="0" aria-label="Close" (click)="close()">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div>
+                        <h3><ng-content select="dialog-title"></ng-content></h3>
+                    </div>
+                </div>
+            </div>
+            <div class="content">
+                <ng-content select="dialog-content"></ng-content>
+            </div>
+            <div class="footer">
+                <ng-content select="dialog-footer"></ng-content>
+            </div>
+        </form>
+    </div>
+</div>

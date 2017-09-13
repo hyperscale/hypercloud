@@ -1,0 +1,29 @@
+.console {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow-y: scroll;
+    max-height: 550px;
+}
+
+.console li {
+    padding: 2px;
+    position: relative;
+}
+
+.console li:hover {
+    background: #e9ebee;
+}
+
+.console li:hover .log-timestamp {
+    display: block;
+    background: #e9ebee;
+    padding-left: 10px;
+}
+
+.log-timestamp {
+    display: none;
+    right: 2px;
+    top: 2px;
+    position: absolute;
+}

@@ -1,0 +1,9 @@
+FROM docker:17.07.0-ce-dind
+LABEL maintainer "Axel Etcheverry <axel@etcheverry.biz>"
+ENV PORT 8080
+ENV DEBUG true
+WORKDIR /opt/hyperpaas/
+EXPOSE ${PORT}
+VOLUME /var/lib/hyperpaas
+ADD hyperpaas /opt/hyperpaas/
+ENTRYPOINT ["/usr/local/bin/dockerd-entrypoint.sh", "/opt/hyperpaas/hyperpaas"]

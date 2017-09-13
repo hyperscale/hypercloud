@@ -1,12 +1,84 @@
-hash: 9beae42277cb14873a55ccc0d69e928c300198d800c6bb66de47e3149ebc899f
-updated: 2017-08-24T00:47:57.81628629+02:00
+hash: 8f722b854438f847de48815042f9534db738f1fe512a2d337b2dff4d5406aa0a
+updated: 2017-09-02T02:52:25.453329101+02:00
 imports:
+- name: github.com/asdine/storm
+  version: e35194f772fef1442e9f6c8526a6c115ca729638
+  subpackages:
+  - codec
+  - codec/json
+  - index
+  - internal
+  - q
+- name: github.com/boltdb/bolt
+  version: 2f1ce7a837dcb8da3ec595b1dac9d0632f0f99e8
+- name: github.com/caarlos0/env
+  version: 0cf029d5748c52beb2c9d20c81880cb4bdf8f788
+- name: github.com/docker/distribution
+  version: 30578ca32960a4d368bf6db67b0a33c2a1f3dc6f
+  subpackages:
+  - digestset
+  - reference
+- name: github.com/docker/docker
+  version: 15b8d0420b57776028875dbf89fc6d9dbb0666e2
+  subpackages:
+  - api
+  - api/types
+  - api/types/blkiodev
+  - api/types/container
+  - api/types/events
+  - api/types/filters
+  - api/types/image
+  - api/types/mount
+  - api/types/network
+  - api/types/registry
+  - api/types/strslice
+  - api/types/swarm
+  - api/types/swarm/runtime
+  - api/types/time
+  - api/types/versions
+  - api/types/volume
+  - pkg/ioutils
+  - pkg/longpath
+  - pkg/mount
+  - pkg/system
+  - pkg/tlsconfig
+- name: github.com/docker/go-connections
+  version: 3ede32e2033de7505e6500d6c868c2b9ed9f169d
+  subpackages:
+  - nat
+  - sockets
+  - tlsconfig
+- name: github.com/docker/go-units
+  version: 0dadbb0345b35ec7ef35e228dabb8de89a65bf52
+- name: github.com/docker/libtrust
+  version: aabc10ec26b754e797f9028f4589c5b7bd90dc20
 - name: github.com/euskadi31/go-service
   version: f8d8c4eab01ab6c71b2512a100adb8b17634fbb6
+- name: github.com/gogo/protobuf
+  version: 100ba4e885062801d56799d78530b73b178a78f3
+  subpackages:
+  - proto
+- name: github.com/gorilla/context
+  version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
 - name: github.com/gorilla/mux
   version: bcd8bc72b08df0f70df986b97f95590779502d31
 - name: github.com/justinas/alice
   version: 052b8b6c18edb9db317af86806d8e00ebaa94160
+- name: github.com/Microsoft/go-winio
+  version: 78439966b38d69bf38227fbf57ac8a6fee70f69a
+- name: github.com/moby/moby
+  version: 90d35abf7b3535c1c319c872900fbd76374e521c
+  subpackages:
+  - client
+- name: github.com/opencontainers/go-digest
+  version: 279bed98673dd5bef374d3b6e4b09e2af76183bf
+- name: github.com/opencontainers/image-spec
+  version: 97ae57f204b5956aa313d453ead9094ff9056b32
+  subpackages:
+  - specs-go
+  - specs-go/v1
+- name: github.com/pkg/errors
+  version: 645ef00459ed84a119197bfb8d8205042c6df63d
 - name: github.com/rs/cors
   version: 7af7a1e09ba336d2ea14b1ce73bf693c6837dbf6
 - name: github.com/rs/xid
@@ -17,6 +89,16 @@ imports:
   - hlog
   - internal/json
   - log
+- name: github.com/satori/go.uuid
+  version: 879c5887cd475cd7864858769793b2ceb0d44feb
+- name: github.com/SermoDigital/jose
+  version: f6df55f235c24f236d11dbcf665249a59ac2021f
+  subpackages:
+  - crypto
+  - jws
+  - jwt
+- name: github.com/sirupsen/logrus
+  version: 89742aefa4b206dcf400792f3bd35b542998eb3b
 - name: github.com/spf13/viper
   version: 25b30aa063fc18e48662b86996252eabdcf2f0c7
 - name: github.com/stretchr/testify
@@ -29,4 +111,21 @@ imports:
   version: c05078ca81941f8e801bba3ddc0e6b86b7fdc893
   subpackages:
   - web/mutil
+- name: golang.org/x/crypto
+  version: 1351f936d976c60a0a48d728281922cf63eafb8d
+  subpackages:
+  - bcrypt
+  - blowfish
+  - ssh/terminal
+- name: golang.org/x/net
+  version: c8c74377599bd978aee1cf3b9b63a8634051cec2
+  subpackages:
+  - context
+  - context/ctxhttp
+  - proxy
+- name: golang.org/x/sys
+  version: ab9e364efd8b52800ff7ee48a9ffba4e0ed78dfb
+  subpackages:
+  - unix
+  - windows
 testImports: []

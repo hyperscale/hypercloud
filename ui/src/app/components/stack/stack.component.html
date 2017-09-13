@@ -1,0 +1,37 @@
+<button class="btn btn-sm btn-outline" (click)="addDialog.open()">Add</button>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th class="left">Name</th>
+            <th class="left">Services</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let stack of stacks">
+            <td class="left">{{ stack.Name }}</td>
+            <td class="left">{{ stack.Service }}</td>
+        </tr>
+    </tbody>
+</table>
+
+
+
+
+<ui-dialog #addDialog [width]="445" [top]="40">
+    <dialog-title>Add Stack</dialog-title>
+    <dialog-content>
+        <form>
+            <div class="form-group">
+                <label>Name</label>
+                <input name="name" type="text" required [(ngModel)]="stack.Name" #name="ngModel" />
+                <div [hidden]="name.valid || name.pristine" class="alert alert-danger">
+                    Name is required
+                </div>
+            </div>
+        </form>
+    </dialog-content>
+    <dialog-footer>
+        <button (click)="onAdd()" type="button">Add</button>
+    </dialog-footer>
+</ui-dialog>

@@ -1,0 +1,32 @@
+
+<button class="btn btn-sm btn-outline" (click)="onOpenCreateNetwork()">Add network</button>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th class="left">Name</th>
+            <th class="left">ID</th>
+            <th class="left">Driver</th>
+            <th class="left">Scope</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let network of networks">
+            <td class="left"><a [routerLink]="['/network/', network.Id]">{{ network.Name }}</a></td>
+            <td class="left">{{ network.Id | truncate:12:' ' }}</td>
+            <td class="left">{{ network.Driver }}</td>
+            <td class="left">{{ network.Scope }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<clr-modal [(clrModalOpen)]="_openCreate">
+    <h3 class="modal-title">Add Network</h3>
+    <div class="modal-body">
+        <p>But not much to say...</p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline" (click)="onCancel()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="onAddNetwork()">Add</button>
+    </div>
+</clr-modal>

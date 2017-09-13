@@ -1,0 +1,90 @@
+
+<div *ngIf="node">
+    <h3>Node specification</h3>
+    <table class="table table-vertical">
+        <tbody>
+            <tr>
+                <th>Name</th>
+                <td>--</td>
+            </tr>
+            <tr>
+                <th>Host name</th>
+                <td>{{ node.Description.Hostname }}</td>
+            </tr>
+            <tr>
+                <th>Role</th>
+                <td>{{ node.Spec.Role }}</td>
+            </tr>
+            <tr>
+                <th>Availability</th>
+                <td>{{ node.Spec.Availability }}</td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td>
+                    <span class="label label-success" *ngIf="node.Status.State == 'ready'">{{ node.Status.State }}</span>
+                    <span class="label label-danger" *ngIf="node.Status.State != 'ready'">{{ node.Status.State }}</span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Manager status</h3>
+    <table class="table table-vertical">
+        <tbody>
+            <tr>
+                <th>Leader</th>
+                <td>
+                    <span class="label label-success" *ngIf="node.ManagerStatus.Leader">Yes</span>
+                    <span class="label label-danger" *ngIf="!node.ManagerStatus.Leader">No</span>
+                </td>
+            </tr>
+            <tr>
+                <th>Reachability</th>
+                <td>{{ node.ManagerStatus.Reachability }}</td>
+            </tr>
+            <tr>
+                <th>Manager address</th>
+                <td>{{ node.ManagerStatus.Addr }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Node description</h3>
+    <table class="table table-vertical">
+        <tbody>
+            <tr>
+                <th>CPU</th>
+                <td>{{ node.Description.Resources.NanoCPUs / 1000000000 }}</td>
+            </tr>
+            <tr>
+                <th>Memory</th>
+                <td>{{ node.Description.Resources.MemoryBytes | size }}</td>
+            </tr>
+            <tr>
+                <th>Platform</th>
+                <td>{{ node.Description.Platform.OS }} {{ node.Description.Platform.Architecture }}</td>
+            </tr>
+            <tr>
+                <th>Docker Engine version</th>
+                <td>{{ node.Description.Engine.EngineVersion }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Node labels</h3>
+    <clr-datagrid>
+        <clr-dg-column>Name</clr-dg-column>
+        <clr-dg-column>Value</clr-dg-column>
+
+        <clr-dg-placeholder>There are no container labels for this node.</clr-dg-placeholder>
+
+        <clr-dg-row *ngFor="let label of labels">
+            <clr-dg-cell>{{ label.name }}</clr-dg-cell>
+            <clr-dg-cell>{{ label.value }}</clr-dg-cell>
+        </clr-dg-row>
+
+        <clr-dg-footer>{{ labels.length }} labels</clr-dg-footer>
+    </clr-datagrid>
+
+</div>

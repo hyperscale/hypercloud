@@ -1,0 +1,58 @@
+
+<button class="btn btn-sm btn-outline" (click)="onOpenCreateRegistry()">Add</button>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th class="left">ID</th>
+            <th class="left">Host</th>
+            <th class="left">Login</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let registry of registries">
+            <td class="left">{{ registry.ID }}</td>
+            <td class="left">{{ registry.Server }}</td>
+            <td class="left">{{ registry.Username }}</td>
+        </tr>
+    </tbody>
+</table>
+
+
+<clr-modal [(clrModalOpen)]="_openCreate">
+    <h3 class="modal-title">Add Registry</h3>
+    <div class="modal-body">
+        <form #registryForm="ngForm" [hidden]="submitted">
+            <section class="form-block">
+                <div class="form-group">
+                    <label for="server">Server</label>
+                    <label for="server" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md" [class.invalid]="server.invalid && (server.dirty || server.touched)">
+                        <input id="server" name="server" type="text" required [(ngModel)]="registry.Server" #server="ngModel" />
+                        <span class="tooltip-content">Server is Required.</span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <label for="username" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md" [class.invalid]="username.invalid && (username.dirty || username.touched)">
+                        <input id="username" name="username" type="text" required [(ngModel)]="registry.Username" #username="ngModel" />
+                        <span class="tooltip-content">Username is Required.</span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <label for="password" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md" [class.invalid]="password.invalid && (password.dirty || password.touched)">
+                        <input id="password" name="password" type="password" required [(ngModel)]="registry.Password" #password="ngModel" />
+                        <span class="tooltip-content">Password is Required.</span>
+                    </label>
+                </div>
+            </section>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline" (click)="onCancel()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="onAddRegistry()" [disabled]="registryForm.invalid">Add</button>
+    </div>
+</clr-modal>
+

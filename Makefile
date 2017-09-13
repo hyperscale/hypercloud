@@ -52,7 +52,8 @@ cover: test
 	@for PKG in $(PACKAGES); do go tool cover -func $$GOPATH/src/$$PKG/coverage.out; echo ""; done;
 
 docker:
-	@sudo docker build --no-cache=true --rm -t $(IMAGE) .
+	#@sudo docker build --no-cache=true --rm -t $(IMAGE) .
+	@sudo docker build --rm -t $(IMAGE) .
 
 publish: docker
 	@sudo docker tag $(IMAGE) $(IMAGE):latest
@@ -69,7 +70,25 @@ $(EXECUTABLE): $(shell find . -type f -print | grep -v vendor | grep "\.go")
 build: $(EXECUTABLE)
 
 run: docker
-	@sudo docker run -p 8578:8080 -v $(shell pwd)/var/lib/hyperpaas:/var/lib/hyperpaas --rm $(IMAGE)
+	@sudo docker run -p 8578:8080 \
+		-e "USERNAME=dacteev" \
+		-e "PASSWORD=test" \
+		-v $(shell pwd)/var/lib/hyperpaas:/var/lib/hyperpaas \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		--rm $(IMAGE)
 
-dev: $(EXECUTABLE)
-	@./$(EXECUTABLE)
+docker-dev:
+	@GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags '-s -w $(LDFLAGS)' ./cmd/hyperpaas/
+	@sudo docker build --rm -t $(IMAGE) -f Dockerfile.dev .
+
+dev: docker-dev
+	@sudo docker run --rm -p 8181:8080 \
+		-e "USERNAME=dacteev" \
+		-e "PASSWORD=test" \
+		-v $(shell pwd)/var/lib/hyperpaas:/var/lib/hyperpaas \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		-v $(shell pwd)/ui/dist:/opt/hyperpaas/ui \
+		--rm $(IMAGE)
+
+dev-ui:
+	@cd ui; ng build --sourcemaps --watch --base-href=/ui/ --aot -dev
