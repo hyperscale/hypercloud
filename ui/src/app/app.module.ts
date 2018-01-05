@@ -3,7 +3,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
-import { ClarityModule } from "clarity-angular";
+import { ClarityModule } from 'clarity-angular';
 
 import { AppRoutingModule } from './app-routing.module';
 
