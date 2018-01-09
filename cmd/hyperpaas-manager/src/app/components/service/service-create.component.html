@@ -1,3 +1,27 @@
-<p>
-  service works!
-</p>
+<h1>Create New Application</h1>
+
+<form #applicationForm="ngForm" (ngSubmit)="onSubmit()" [hidden]="submitted">
+        <section class="form-block">
+
+            <div class="form-group">
+                <label for="applicationName" class="required">Application Name</label>
+                <label for="applicationName" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md" [class.invalid]="applicationNameInput.invalid && (applicationNameInput.dirty || applicationNameInput.touched)">
+                    <input type="text" id="applicationName" placeholder="app-name"
+                        required
+                        minlength="3"
+                        applicationNameValidator
+                        name="applicationName"
+                        [(ngModel)]="application.name"
+                        #applicationNameInput="ngModel" />
+                    <span class="tooltip-content">
+                        <ng-container *ngIf="applicationNameInput.errors?.minlength">This name is too short (minimum is 3 characters).</ng-container>
+                        <ng-container *ngIf="applicationNameInput.errors?.required">Application Name is Required.</ng-container>
+                        <ng-container *ngIf="applicationNameInput.errors?.applicationName">This name should only contain lowercase letters, numbers, and dashes.</ng-container>
+                    </span>
+                </label>
+            </div>
+
+        </section>
+
+        <button type="submit" class="btn btn-primary" [disabled]="!applicationForm.form.valid">Create Application</button>
+    </form>
