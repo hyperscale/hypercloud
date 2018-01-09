@@ -92,3 +92,18 @@ dev: docker-dev
 
 dev-ui:
 	@cd ui; ng build --sourcemaps --watch --base-href=/ui/ --aot -dev
+
+build-hyperpaas-server: $(shell find . -type f -print | grep -v vendor | grep "\.go")
+	@echo "Building hyperpaas-server..."
+	@CGO_ENABLED=0 go build ./cmd/hyperpaas-server/
+
+run-hyperpaas-server: build-hyperpaas-server
+	./hyperpaas-server
+
+build-hyperpaas-installer: $(shell find . -type f -print | grep -v vendor | grep "\.go")
+	@echo "Building hyperpaas-installer..."
+	@go generate ./cmd/hyperpaas-installer/
+	@CGO_ENABLED=0 go build ./cmd/hyperpaas-installer/
+
+run-hyperpaas-installer: build-hyperpaas-installer
+	./hyperpaas-installer

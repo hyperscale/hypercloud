@@ -4,3 +4,8 @@ vendor/
 config.yml
 var/
 hyperpaas
+hyperpaas-installer
+hyperpaas-server
+_v1/
+node_modules
+cmd/hyperpaas-manager/node_modules

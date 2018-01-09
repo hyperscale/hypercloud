@@ -1,2 +1,5 @@
 _resources/*
 var/*
+_v1/*
+vendor/*
+.DS_Store

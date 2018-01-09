@@ -4,10 +4,37 @@
 
 package config
 
+import (
+	"github.com/spf13/viper"
+)
+
 // Configuration struct
 type Configuration struct {
-	Debug      bool   `env:"DEBUG" envDefault:"false"`
-	Port       int    `env:"PORT" envDefault:"8080"`
-	DockerHost string `env:"DOCKER_HOST" envDefault:"unix:///var/run/docker.sock"`
-	Path       string `env:"HYPERPAAS_PATH" envDefault:"/var/lib/hyperpaas"`
+	Logger   *LoggerConfiguration
+	Server   *ServerConfiguration
+	Docker   *DockerConfiguration
+	Database *DatabaseConfiguration
+}
+
+// NewConfiguration constructor
+func NewConfiguration(options *viper.Viper) *Configuration {
+	return &Configuration{
+		Server: &ServerConfiguration{
+			Host:              options.GetString("server.host"),
+			Port:              options.GetInt("server.port"),
+			Debug:             options.GetBool("server.debug"),
+			ShutdownTimeout:   options.GetDuration("server.shutdown_timeout"),
+			WriteTimeout:      options.GetDuration("server.write_timeout"),
+			ReadTimeout:       options.GetDuration("server.read_timeout"),
+			ReadHeaderTimeout: options.GetDuration("server.read_header_timeout"),
+		},
+		Logger: &LoggerConfiguration{
+			LevelName: options.GetString("logger.level"),
+			Prefix:    options.GetString("logger.prefix"),
+		},
+		Docker: &DockerConfiguration{},
+		Database: &DatabaseConfiguration{
+			Path: options.GetString("database.path"),
+		},
+	}
 }

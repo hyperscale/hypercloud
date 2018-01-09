@@ -26,3 +26,6 @@ indent_size = 2
 
 [*.yml.dist]
 indent_size = 2
+
+[*.json]
+indent_size = 2

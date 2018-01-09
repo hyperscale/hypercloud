@@ -1,0 +1,41 @@
+<clr-main-container>
+    <clr-header>
+        <div class="branding">
+            <a class="nav-link" routerLink="/">
+                <span class="title">HyperPaaS</span>
+            </a>
+        </div>
+        <div class="header-actions">
+            <clr-dropdown>
+                <button class="nav-icon" clrDropdownTrigger>
+                    <clr-icon shape="user"></clr-icon>
+                    <clr-icon shape="caret down"></clr-icon>
+                </button>
+                <clr-dropdown-menu *clrIfOpen clrPosition="bottom-right">
+                    <a href="#" (click)="onLogout($event)" clrDropdownItem>Log out</a>
+                </clr-dropdown-menu>
+            </clr-dropdown>
+        </div>
+    </clr-header>
+
+    <div class="content-container">
+        <div class="content-area">
+            <router-outlet></router-outlet>
+        </div>
+
+        <clr-vertical-nav [clrVerticalNavCollapsible]="collapsible" [(clrVerticalNavCollapsed)]="collapsed">
+            <a clrVerticalNavLink routerLink="/dashboard" routerLinkActive="active">
+                <clr-icon clrVerticalNavIcon shape="dashboard"></clr-icon>
+                Dashboard
+            </a>
+            <a clrVerticalNavLink routerLink="/collection" routerLinkActive="active">
+                <clr-icon clrVerticalNavIcon shape="organization"></clr-icon>
+                Collection
+            </a>
+            <a clrVerticalNavLink routerLink="/node" routerLinkActive="active">
+                <clr-icon clrVerticalNavIcon shape="rack-server"></clr-icon>
+                Node
+            </a>
+        </clr-vertical-nav>
+    </div>
+</clr-main-container>
