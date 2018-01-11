@@ -17,6 +17,7 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/euskadi31/go-server"
 	"github.com/euskadi31/go-service"
+	"github.com/hyperscale/hyperpaas/cmd/hyperpaas-server/assets"
 	"github.com/hyperscale/hyperpaas/cmd/hyperpaas-server/controller"
 	"github.com/hyperscale/hyperpaas/config"
 	"github.com/hyperscale/hyperpaas/version"
@@ -182,7 +183,7 @@ func init() {
 	container.Set(ServiceValidatorKey, func(c *service.Container) interface{} {
 		validator := server.NewValidator()
 
-		if schema, err := Asset("schema/application.json"); err == nil {
+		if schema, err := assets.Asset("schema/application.json"); err == nil {
 			validator.AddSchemaFromJSON("application", schema)
 		} else {
 			log.Fatal().Err(err).Msg("Asset: schema/application.json")

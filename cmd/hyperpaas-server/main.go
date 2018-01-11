@@ -13,8 +13,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-//go:generate go-bindata -pkg $GOPACKAGE -o assets.go schema/
-
 func main() {
 	_ = container.Get(ServiceLoggerKey).(zerolog.Logger)
 	cfg := container.Get(ServiceConfigKey).(*config.Configuration)

@@ -1,0 +1,90 @@
+{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "https"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "title": "HyperPaaS Server API.",
+    "contact": {
+      "name": "Axel Etcheverry",
+      "email": "axel@etcheverry.biz"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "http://opensource.org/licenses/MIT"
+    },
+    "version": "1.0.0"
+  },
+  "host": "localhost",
+  "basePath": "/v1",
+  "paths": {
+    "/v1/applications": {
+      "get": {
+        "description": "Get the applications list",
+        "tags": [
+          "Application"
+        ],
+        "operationId": "getApplicationsList",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/Application"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Application": {
+      "type": "object",
+      "title": "Application represents a Application.",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "CreatedAt"
+        },
+        "hosts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "Hosts"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}$",
+          "x-go-name": "ID"
+        },
+        "name": {
+          "description": "Application name.",
+          "type": "string",
+          "minLength": 3,
+          "pattern": "^[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*$",
+          "x-go-name": "Name"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "UpdatedAt"
+        }
+      },
+      "x-go-package": "github.com/hyperscale/hyperpaas/database/entity"
+    }
+  },
+  "responses": {
+    "Application": {
+      "schema": {
+        "$ref": "#/definitions/Application"
+      }
+    }
+  }
+}

@@ -94,7 +94,7 @@
   branch = "master"
   name = "github.com/euskadi31/go-std"
   packages = ["."]
-  revision = "9c901318e414de86efca19f22c45f102fcfe631a"
+  revision = "8d07a999356b3e7ea1b4ceb3303bacbeddd15e2d"
 
 [[projects]]
   name = "github.com/fsnotify/fsnotify"

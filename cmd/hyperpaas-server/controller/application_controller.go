@@ -46,6 +46,13 @@ func (c ApplicationController) Mount(r *server.Router) {
 }
 
 // GetApplicationsHandler endpoint
+// swagger:route GET /v1/applications Application getApplicationsList
+//
+// Get the applications list
+//
+//     Responses:
+//       200: Application
+//
 func (c ApplicationController) GetApplicationsHandler(w http.ResponseWriter, r *http.Request) {
 	// ctx := r.Context()
 
