@@ -36,6 +36,7 @@ const (
 	ServiceAppKey                          = "service.app"
 	ServiceTopologyControllerKey           = "service.controller.topology"
 	ServiceApplicationControllerKey        = "service.controller.application"
+	ServiceDeployControllerKey             = "service.controller.deploy"
 	ServiceValidatorKey                    = "service.validator"
 	ServiceDBKey                           = "service.db.storm"
 )
@@ -165,6 +166,19 @@ func init() {
 		return controller
 	})
 
+	container.Set(ServiceDeployControllerKey, func(c *service.Container) interface{} {
+		dockerClient := c.Get(ServiceDockerKey).(*client.Client)
+		db := c.Get(ServiceDBKey).(*storm.DB)
+		validator := c.Get(ServiceValidatorKey).(*server.Validator)
+
+		controller, err := controller.NewDeployController(dockerClient, db, validator)
+		if err != nil {
+			log.Fatal().Err(err).Msg(ServiceDeployControllerKey)
+		}
+
+		return controller
+	})
+
 	container.Set(ServiceValidatorKey, func(c *service.Container) interface{} {
 		validator := server.NewValidator()
 
@@ -183,6 +197,7 @@ func init() {
 		cfg := c.Get(ServiceConfigKey).(*config.Configuration)
 		topologyController := c.Get(ServiceTopologyControllerKey).(server.Controller)
 		applicationController := c.Get(ServiceApplicationControllerKey).(server.Controller)
+		deployController := c.Get(ServiceDeployControllerKey).(server.Controller)
 
 		router := server.NewRouter()
 
@@ -246,6 +261,7 @@ func init() {
 
 		router.AddController(topologyController)
 		router.AddController(applicationController)
+		router.AddController(deployController)
 
 		return router
 	})
