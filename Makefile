@@ -95,6 +95,7 @@ dev-ui:
 
 build-hyperpaas-server: $(shell find . -type f -print | grep -v vendor | grep "\.go")
 	@echo "Building hyperpaas-server..."
+	@go generate ./cmd/hyperpaas-server/
 	@CGO_ENABLED=0 go build ./cmd/hyperpaas-server/
 
 run-hyperpaas-server: build-hyperpaas-server

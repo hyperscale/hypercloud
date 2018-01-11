@@ -25,4 +25,8 @@ export class ServiceCreateComponent implements OnInit, OnDestroy {
     onSubmit() {
         this.submitted = true;
     }
+
+    get diagnostic() {
+        return JSON.stringify(this.application, null, '  ');
+    }
 }

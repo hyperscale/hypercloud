@@ -9,3 +9,5 @@ hyperpaas-server
 _v1/
 node_modules
 cmd/hyperpaas-manager/node_modules
+!cmd/hyperpaas-installer
+!cmd/hyperpaas-server
