@@ -24,25 +24,137 @@
   "host": "localhost",
   "basePath": "/v1",
   "paths": {
-    "/v1/applications": {
+    "/v1/deploy/{application_id}/hooks/{provider}": {
       "get": {
-        "description": "Get the applications list",
+        "description": "Trigger new deployment for {application_id} from {provider}",
         "tags": [
-          "Application"
+          "Deploy"
         ],
-        "operationId": "getApplicationsList",
+        "operationId": "postDeployHookHandler",
+        "responses": {}
+      }
+    },
+    "/v1/nodes": {
+      "get": {
+        "description": "Get the nodes list",
+        "tags": [
+          "Node"
+        ],
+        "operationId": "getNodesHandler",
         "responses": {
           "200": {
-            "$ref": "#/responses/Application"
+            "$ref": "#/responses/Node"
+          }
+        }
+      }
+    },
+    "/v1/services": {
+      "get": {
+        "description": "Get the services list",
+        "tags": [
+          "Service"
+        ],
+        "operationId": "getServicesHandler",
+        "parameters": [
+          {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string",
+            "name": "StackID",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/Service"
+          }
+        }
+      },
+      "post": {
+        "description": "Create service",
+        "tags": [
+          "Service"
+        ],
+        "operationId": "postServiceHandler",
+        "responses": {
+          "201": {
+            "$ref": "#/responses/Service"
+          }
+        }
+      }
+    },
+    "/v1/services/{id}": {
+      "get": {
+        "description": "Get a service by id",
+        "tags": [
+          "Stack"
+        ],
+        "operationId": "getServiceHandler",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/Service"
+          }
+        }
+      }
+    },
+    "/v1/stacks": {
+      "get": {
+        "description": "Get the stacks list",
+        "tags": [
+          "Stack"
+        ],
+        "operationId": "getStacksHandler",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/Stack"
+          }
+        }
+      },
+      "post": {
+        "description": "Create stack",
+        "tags": [
+          "Stack"
+        ],
+        "operationId": "postStacksHandler",
+        "responses": {
+          "201": {
+            "$ref": "#/responses/Stack"
+          }
+        }
+      }
+    },
+    "/v1/stacks/{id}": {
+      "get": {
+        "description": "Get a stack by id",
+        "tags": [
+          "Stack"
+        ],
+        "operationId": "getStackHandler",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/Stack"
+          }
+        }
+      }
+    },
+    "/v1/stacks/{id}/services": {
+      "post": {
+        "description": "Get stack services list",
+        "tags": [
+          "Stack"
+        ],
+        "operationId": "getStackServicesHandler",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/Service"
           }
         }
       }
     }
   },
   "definitions": {
-    "Application": {
+    "Service": {
       "type": "object",
-      "title": "Application represents a Application.",
+      "title": "Service represents a Service.",
       "required": [
         "name"
       ],
@@ -61,15 +173,20 @@
         },
         "id": {
           "type": "string",
-          "pattern": "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}$",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
           "x-go-name": "ID"
         },
         "name": {
-          "description": "Application name.",
+          "description": "Service name.",
           "type": "string",
           "minLength": 3,
-          "pattern": "^[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*$",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
           "x-go-name": "Name"
+        },
+        "stack_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "x-go-name": "StackID"
         },
         "updated_at": {
           "type": "string",
@@ -78,12 +195,91 @@
         }
       },
       "x-go-package": "github.com/hyperscale/hyperpaas/database/entity"
+    },
+    "Stack": {
+      "type": "object",
+      "title": "Stack represents a Stack.",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "CreatedAt"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "x-go-name": "ID"
+        },
+        "name": {
+          "description": "Stack name.",
+          "type": "string",
+          "minLength": 3,
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "x-go-name": "Name"
+        },
+        "services": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Services"
+        },
+        "version": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Version"
+        }
+      },
+      "x-go-package": "github.com/hyperscale/hyperpaas/database/entity"
+    },
+    "StackCompose": {
+      "type": "object",
+      "title": "StackCompose represents a Stack Compose.",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "CreatedAt"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "x-go-name": "ID"
+        },
+        "stack_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "x-go-name": "StackID"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "UpdatedAt"
+        },
+        "version": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Version"
+        }
+      },
+      "x-go-package": "github.com/hyperscale/hyperpaas/database/entity"
     }
   },
   "responses": {
-    "Application": {
+    "Service": {
       "schema": {
-        "$ref": "#/definitions/Application"
+        "$ref": "#/definitions/Service"
+      }
+    },
+    "Stack": {
+      "schema": {
+        "$ref": "#/definitions/Stack"
+      }
+    },
+    "StackCompose": {
+      "schema": {
+        "$ref": "#/definitions/StackCompose"
       }
     }
   }

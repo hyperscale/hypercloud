@@ -32,7 +32,9 @@ func NewConfiguration(options *viper.Viper) *Configuration {
 			LevelName: options.GetString("logger.level"),
 			Prefix:    options.GetString("logger.prefix"),
 		},
-		Docker: &DockerConfiguration{},
+		Docker: &DockerConfiguration{
+			Host: options.GetString("docker.host"),
+		},
 		Database: &DatabaseConfiguration{
 			Path: options.GetString("database.path"),
 		},

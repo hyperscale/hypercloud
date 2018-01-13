@@ -1,0 +1,55 @@
+<h2>Stacks</h2>
+
+<button class="btn btn-sm btn-outline" (click)="_createStackModalOpened = true">Create New Stack</button>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th class="left">Name</th>
+            <th class="left">Services</th>
+            <th class="left">Created At</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let stack of stacks">
+            <td class="left"><a [routerLink]="['/stack/', stack.id]">{{ stack.name }}</a></td>
+            <td class="left">{{ stack.services }}</td>
+            <td class="left">{{ stack.created_at | date }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<clr-modal [(clrModalOpen)]="_createStackModalOpened">
+    <h3 class="modal-title">Create New Stack</h3>
+    <div class="modal-body">
+
+        <form #stackForm="ngForm" (ngSubmit)="onSubmit()" [hidden]="submitted">
+            <section class="form-block">
+
+                <div class="form-group">
+                    <label for="stackName" class="required">Stack Name</label>
+                    <label for="stackName" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md" [class.invalid]="stackNameInput.invalid && (stackNameInput.dirty || stackNameInput.touched)">
+                        <input type="text" id="stackName" placeholder="stack-name"
+                            required
+                            minlength="3"
+                            pattern="^[a-z]+(?:-[a-z0-9]+)*$"
+                            name="stackName"
+                            [(ngModel)]="stack.name"
+                            #stackNameInput="ngModel" />
+                        <span class="tooltip-content">
+                            <ng-container *ngIf="stackNameInput.errors?.minlength">This name is too short (minimum is 3 characters).</ng-container>
+                            <ng-container *ngIf="stackNameInput.errors?.required">Stack Name is Required.</ng-container>
+                            <ng-container *ngIf="stackNameInput.errors?.pattern">This name should only contain lowercase letters, numbers, and dashes.</ng-container>
+                        </span>
+                    </label>
+                </div>
+
+            </section>
+
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline" (click)="onResetStack()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="stackForm.ngSubmit.emit()" [disabled]="!stackForm.form.valid">Create Stack</button>
+    </div>
+</clr-modal>

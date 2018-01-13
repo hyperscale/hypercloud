@@ -1,29 +1,38 @@
-<h1>Create New Application</h1>
+<h2>Create New Service</h2>
 
-<form #applicationForm="ngForm" (ngSubmit)="onSubmit()" [hidden]="submitted">
+<form #serviceForm="ngForm" (ngSubmit)="onSubmit()" [hidden]="submitted">
     <section class="form-block">
 
         <div class="form-group">
-            <label for="applicationName" class="required">Application Name</label>
-            <label for="applicationName" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md" [class.invalid]="applicationNameInput.invalid && (applicationNameInput.dirty || applicationNameInput.touched)">
-                <input type="text" id="applicationName" placeholder="app-name"
+            <label for="serviceStack" class="required">Stack Name</label>
+            <div class="select">
+                <select id="serviceStack" [(ngModel)]="service.stack_id" name="serviceStack">
+                    <option *ngFor="let stack of stacks" [ngValue]="stack.id" [selected]="stack.id === service?.stack_id">{{ stack.name }}</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="serviceName" class="required">Service Name</label>
+            <label for="serviceName" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md" [class.invalid]="serviceNameInput.invalid && (serviceNameInput.dirty || serviceNameInput.touched)">
+                <input type="text" id="serviceName" placeholder="app-name"
                     required
                     minlength="3"
-                    appApplicationNameValidator
-                    name="applicationName"
-                    [(ngModel)]="application.name"
-                    #applicationNameInput="ngModel" />
+                    pattern="^[a-z]+(?:-[a-z0-9]+)*$"
+                    name="serviceName"
+                    [(ngModel)]="service.name"
+                    #serviceNameInput="ngModel" />
                 <span class="tooltip-content">
-                    <ng-container *ngIf="applicationNameInput.errors?.minlength">This name is too short (minimum is 3 characters).</ng-container>
-                    <ng-container *ngIf="applicationNameInput.errors?.required">Application Name is Required.</ng-container>
-                    <ng-container *ngIf="applicationNameInput.errors?.applicationName">This name should only contain lowercase letters, numbers, and dashes.</ng-container>
+                    <ng-container *ngIf="serviceNameInput.errors?.minlength">This name is too short (minimum is 3 characters).</ng-container>
+                    <ng-container *ngIf="serviceNameInput.errors?.required">Service Name is Required.</ng-container>
+                    <ng-container *ngIf="serviceNameInput.errors?.pattern">This name should only contain lowercase letters, numbers, and dashes.</ng-container>
                 </span>
             </label>
         </div>
 
     </section>
 
-    <button type="submit" class="btn btn-primary" [disabled]="!applicationForm.form.valid">Create Application</button>
+    <button type="submit" class="btn btn-primary" [disabled]="!serviceForm.form.valid">Create Service</button>
 </form>
 
 <pre><code>{{ diagnostic }}</code></pre>

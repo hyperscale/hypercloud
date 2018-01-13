@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}$"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z]+(?:-[a-z0-9]+)*$",
+      "minLength": 3
+    },
+    "services": {
+      "type": "number"
+    },
+    "version": {
+      "type": "number"
+    },
+    "created_at": {
+      "type": ["string", "null"],
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}\\:\\d{2}\\:\\d{2}[+-]\\d{4}$"
+    }
+  },
+  "required": ["name"],
+  "additionalProperties": false
+}

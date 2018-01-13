@@ -1,0 +1,58 @@
+<h2>Service {{ service?.name }}</h2>
+
+<clr-tabs>
+    <clr-tab>
+        <button clrTabLink>Overview</button>
+        <ng-template [(clrIfActive)]="overviewActive">
+            <clr-tab-content>
+                <app-service-detail-overview></app-service-detail-overview>
+            </clr-tab-content>
+        </ng-template>
+    </clr-tab>
+
+    <clr-tab>
+        <button clrTabLink>Resources</button>
+        <ng-template [(clrIfActive)]="resourcesActive">
+            <clr-tab-content>
+                ...q
+            </clr-tab-content>
+        </ng-template>
+    </clr-tab>
+
+    <clr-tab>
+        <button clrTabLink>Deploy</button>
+        <ng-template [(clrIfActive)]="deployActive">
+            <clr-tab-content>
+                ...
+            </clr-tab-content>
+        </ng-template>
+    </clr-tab>
+
+    <clr-tab>
+        <button clrTabLink>Metrics</button>
+        <ng-template [(clrIfActive)]="metricsActive">
+            <clr-tab-content>
+                ...
+            </clr-tab-content>
+        </ng-template>
+    </clr-tab>
+
+    <clr-tab>
+        <button clrTabLink>Activity</button>
+        <ng-template [(clrIfActive)]="activityActive">
+            <clr-tab-content>
+                ...
+            </clr-tab-content>
+        </ng-template>
+    </clr-tab>
+
+    <clr-tab>
+        <button clrTabLink>Settings</button>
+        <ng-template [(clrIfActive)]="settingsActive">
+            <clr-tab-content>
+                ...
+            </clr-tab-content>
+        </ng-template>
+    </clr-tab>
+
+</clr-tabs>

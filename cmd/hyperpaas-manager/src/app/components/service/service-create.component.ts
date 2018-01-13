@@ -1,6 +1,9 @@
 import { Component, OnInit, OnDestroy, OnChanges, EventEmitter, Input, Output, SimpleChanges} from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Application } from '../../entities/application';
+import { Stack } from '../../entities/stack';
+import { Service } from '../../entities/service';
+import { StackService } from '../../services/stack.service';
+import { ServiceService } from '../../services/service.service';
 
 @Component({
     selector: 'app-service-create',
@@ -8,25 +11,44 @@ import { Application } from '../../entities/application';
     styleUrls: ['./service-create.component.less']
 })
 export class ServiceCreateComponent implements OnInit, OnDestroy {
-    public application = new Application();
+    public service = new Service();
+    public stacks: Stack[] = [];
 
     public submitted = false;
 
-    constructor() {
+    constructor(
+        private stackService: StackService,
+        private serviceService: ServiceService
+    ) {
     }
 
     ngOnInit(): void {
+        this.stackService.getStacks().then(stacks => this.stacks = stacks);
     }
 
     ngOnDestroy(): void {
         this.submitted = false;
     }
 
+    onReset() {
+        this.service = new Service();
+        this.submitted = false;
+    }
+
     onSubmit() {
         this.submitted = true;
+
+        console.log('Service Request:', this.service);
+
+        this.serviceService.create(this.service).then(service => {
+            console.log('Service Response', service);
+
+            this.onReset();
+            // @todo: redirect
+        });
     }
 
     get diagnostic() {
-        return JSON.stringify(this.application, null, '  ');
+        return JSON.stringify(this.service, null, '  ');
     }
 }

@@ -9,9 +9,9 @@ import (
 	"net/http"
 
 	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/client"
 	"github.com/euskadi31/go-server"
 	"github.com/gorilla/mux"
+	"github.com/hyperscale/hyperpaas/docker"
 	"github.com/rs/zerolog/log"
 )
 
@@ -26,11 +26,11 @@ var acceptedLabels = map[string]bool{
 
 // TopologyController struct
 type TopologyController struct {
-	dockerClient *client.Client
+	dockerClient *docker.Client
 }
 
 // NewTopologyController func
-func NewTopologyController(dockerClient *client.Client) (*TopologyController, error) {
+func NewTopologyController(dockerClient *docker.Client) (*TopologyController, error) {
 	return &TopologyController{
 		dockerClient: dockerClient,
 	}, nil

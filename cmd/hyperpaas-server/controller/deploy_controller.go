@@ -13,9 +13,8 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/asdine/storm"
-	"github.com/docker/docker/client"
 	"github.com/euskadi31/go-server"
-	"github.com/hyperscale/hyperpaas/database/entity"
+	"github.com/hyperscale/hyperpaas/docker"
 	"github.com/hyperscale/hyperpaas/provider/vcs/bitbucket"
 )
 
@@ -27,17 +26,13 @@ type PushEvent struct {
 
 // DeployController struct
 type DeployController struct {
-	dockerClient *client.Client
+	dockerClient *docker.Client
 	db           *storm.DB
 	validator    *server.Validator
 }
 
 // NewDeployController func
-func NewDeployController(dockerClient *client.Client, db *storm.DB, validator *server.Validator) (*DeployController, error) {
-	if err := db.Init(&entity.Application{}); err != nil {
-		return nil, err
-	}
-
+func NewDeployController(dockerClient *docker.Client, db *storm.DB, validator *server.Validator) (*DeployController, error) {
 	return &DeployController{
 		dockerClient: dockerClient,
 		db:           db,
@@ -47,12 +42,17 @@ func NewDeployController(dockerClient *client.Client, db *storm.DB, validator *s
 
 // Mount endpoints
 func (c DeployController) Mount(r *server.Router) {
-	r.AddRouteFunc("/v1/deploy/{id:[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}}/hooks/{provider:[a-z]+}", c.PostDeployHookHandler).Methods(http.MethodPost)
-	//r.AddRouteFunc("/v1/deploy/{id:[0-9A-Fa-f\\-]+}/hooks/{provider:[a-z]+}", c.PostDeployHookHandler).Methods(http.MethodPost)
+	r.AddRouteFunc("/v1/deploy/{id:[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}}/hooks/{provider:[a-z]+}", c.postDeployHookHandler).Methods(http.MethodPost)
 }
 
-// PostDeployHookHandler endpoint
-func (c DeployController) PostDeployHookHandler(w http.ResponseWriter, r *http.Request) {
+// swagger:route GET /v1/deploy/{application_id}/hooks/{provider} Deploy postDeployHookHandler
+//
+// Trigger new deployment for {application_id} from {provider}
+//
+//     Responses:
+//       204
+//
+func (c DeployController) postDeployHookHandler(w http.ResponseWriter, r *http.Request) {
 	// ctx := r.Context()
 
 	params := mux.Vars(r)

@@ -14,12 +14,12 @@ import (
 	"time"
 
 	"github.com/asdine/storm"
-	"github.com/docker/docker/client"
 	"github.com/euskadi31/go-server"
 	"github.com/euskadi31/go-service"
 	"github.com/hyperscale/hyperpaas/cmd/hyperpaas-server/assets"
 	"github.com/hyperscale/hyperpaas/cmd/hyperpaas-server/controller"
 	"github.com/hyperscale/hyperpaas/config"
+	"github.com/hyperscale/hyperpaas/docker"
 	"github.com/hyperscale/hyperpaas/version"
 	"github.com/rs/cors"
 	"github.com/rs/zerolog"
@@ -30,16 +30,19 @@ import (
 
 // const of service name
 const (
-	ServiceLoggerKey                string = "service.logger"
-	ServiceConfigKey                       = "service.config"
-	ServiceRouterKey                       = "service.router"
-	ServiceDockerKey                       = "service.docker.client"
-	ServiceAppKey                          = "service.app"
-	ServiceTopologyControllerKey           = "service.controller.topology"
-	ServiceApplicationControllerKey        = "service.controller.application"
-	ServiceDeployControllerKey             = "service.controller.deploy"
-	ServiceValidatorKey                    = "service.validator"
-	ServiceDBKey                           = "service.db.storm"
+	ServiceLoggerKey             string = "service.logger"
+	ServiceConfigKey                    = "service.config"
+	ServiceRouterKey                    = "service.router"
+	ServiceDockerKey                    = "service.docker.client"
+	ServiceAppKey                       = "service.app"
+	ServiceTopologyControllerKey        = "service.controller.topology"
+	ServiceServiceControllerKey         = "service.controller.service"
+	ServiceDeployControllerKey          = "service.controller.deploy"
+	ServiceStackControllerKey           = "service.controller.stack"
+	ServiceNodeControllerKey            = "service.controller.node"
+	ServiceDockerControllerKey          = "service.controller.docker"
+	ServiceValidatorKey                 = "service.validator"
+	ServiceDBKey                        = "service.db.storm"
 )
 
 const applicationName = "hyperpaas-server"
@@ -98,6 +101,7 @@ func init() {
 		options.SetDefault("logger.level", "debug")
 		options.SetDefault("logger.prefix", applicationName)
 		options.SetDefault("database.path", "/var/lib/hyperpaas")
+		options.SetDefault("docker.host", "unix:///var/run/docker.sock")
 
 		options.SetConfigName("config") // name of config file (without extension)
 
@@ -135,7 +139,7 @@ func init() {
 	})
 
 	container.Set(ServiceDockerKey, func(c *service.Container) interface{} {
-		dc, err := client.NewEnvClient()
+		dc, err := docker.NewEnvClient()
 		if err != nil {
 			log.Fatal().Err(err).Msg(ServiceDockerKey)
 		}
@@ -144,7 +148,7 @@ func init() {
 	})
 
 	container.Set(ServiceTopologyControllerKey, func(c *service.Container) interface{} {
-		dockerClient := c.Get(ServiceDockerKey).(*client.Client)
+		dockerClient := c.Get(ServiceDockerKey).(*docker.Client)
 
 		controller, err := controller.NewTopologyController(dockerClient)
 		if err != nil {
@@ -154,21 +158,21 @@ func init() {
 		return controller
 	})
 
-	container.Set(ServiceApplicationControllerKey, func(c *service.Container) interface{} {
-		dockerClient := c.Get(ServiceDockerKey).(*client.Client)
+	container.Set(ServiceServiceControllerKey, func(c *service.Container) interface{} {
+		dockerClient := c.Get(ServiceDockerKey).(*docker.Client)
 		db := c.Get(ServiceDBKey).(*storm.DB)
 		validator := c.Get(ServiceValidatorKey).(*server.Validator)
 
-		controller, err := controller.NewApplicationController(dockerClient, db, validator)
+		controller, err := controller.NewServiceController(dockerClient, db, validator)
 		if err != nil {
-			log.Fatal().Err(err).Msg(ServiceApplicationControllerKey)
+			log.Fatal().Err(err).Msg(ServiceServiceControllerKey)
 		}
 
 		return controller
 	})
 
 	container.Set(ServiceDeployControllerKey, func(c *service.Container) interface{} {
-		dockerClient := c.Get(ServiceDockerKey).(*client.Client)
+		dockerClient := c.Get(ServiceDockerKey).(*docker.Client)
 		db := c.Get(ServiceDBKey).(*storm.DB)
 		validator := c.Get(ServiceValidatorKey).(*server.Validator)
 
@@ -180,13 +184,43 @@ func init() {
 		return controller
 	})
 
+	container.Set(ServiceStackControllerKey, func(c *service.Container) interface{} {
+		dockerClient := c.Get(ServiceDockerKey).(*docker.Client)
+		db := c.Get(ServiceDBKey).(*storm.DB)
+		validator := c.Get(ServiceValidatorKey).(*server.Validator)
+
+		controller, err := controller.NewStackController(dockerClient, db, validator)
+		if err != nil {
+			log.Fatal().Err(err).Msg(ServiceStackControllerKey)
+		}
+
+		return controller
+	})
+
+	container.Set(ServiceDockerControllerKey, func(c *service.Container) interface{} {
+		cfg := c.Get(ServiceConfigKey).(*config.Configuration)
+
+		controller, err := controller.NewDockerController(cfg.Docker.Host)
+		if err != nil {
+			log.Fatal().Err(err).Msg(ServiceDockerControllerKey)
+		}
+
+		return controller
+	})
+
 	container.Set(ServiceValidatorKey, func(c *service.Container) interface{} {
 		validator := server.NewValidator()
 
-		if schema, err := assets.Asset("schema/application.json"); err == nil {
-			validator.AddSchemaFromJSON("application", schema)
+		if schema, err := assets.Asset("schema/service.json"); err == nil {
+			validator.AddSchemaFromJSON("service", schema)
 		} else {
-			log.Fatal().Err(err).Msg("Asset: schema/application.json")
+			log.Fatal().Err(err).Msg("Asset: schema/service.json")
+		}
+
+		if schema, err := assets.Asset("schema/stack.json"); err == nil {
+			validator.AddSchemaFromJSON("stack", schema)
+		} else {
+			log.Fatal().Err(err).Msg("Asset: schema/stack.json")
 		}
 
 		return validator
@@ -196,9 +230,12 @@ func init() {
 	container.Set(ServiceRouterKey, func(c *service.Container) interface{} {
 		logger := c.Get(ServiceLoggerKey).(zerolog.Logger)
 		cfg := c.Get(ServiceConfigKey).(*config.Configuration)
+		dockerClient := c.Get(ServiceDockerKey).(*docker.Client)
 		topologyController := c.Get(ServiceTopologyControllerKey).(server.Controller)
-		applicationController := c.Get(ServiceApplicationControllerKey).(server.Controller)
+		applicationController := c.Get(ServiceServiceControllerKey).(server.Controller)
 		deployController := c.Get(ServiceDeployControllerKey).(server.Controller)
+		stackController := c.Get(ServiceStackControllerKey).(server.Controller)
+		dockerController := c.Get(ServiceDockerControllerKey).(server.Controller)
 
 		router := server.NewRouter()
 
@@ -260,9 +297,13 @@ func init() {
 			})
 		})
 
+		router.AddHealthCheck("docker", docker.NewHealthCheck(dockerClient))
+
 		router.AddController(topologyController)
 		router.AddController(applicationController)
 		router.AddController(deployController)
+		router.AddController(stackController)
+		router.AddController(dockerController)
 
 		return router
 	})

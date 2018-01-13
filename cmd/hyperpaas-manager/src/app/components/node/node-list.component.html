@@ -1,0 +1,46 @@
+<h2>Nodes</h2>
+
+<button class="btn btn-sm btn-outline" (click)="_createNodeModalOpened = true">Add New Node</button>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th class="left">Hostname</th>
+            <th class="left">Role</th>
+            <th class="left">CPU</th>
+            <th class="left">Memory</th>
+            <th class="left">Engine</th>
+            <th class="left">IP Address</th>
+            <th class="left">Availability</th>
+            <th class="left">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let node of nodes">
+            <td class="left"><a [routerLink]="['/cluster/node', node.ID]">{{ node.Description.Hostname }}</a></td>
+            <td class="left">{{ node.Spec.Role }}</td>
+            <td class="left">{{ node.Description.Resources.NanoCPUs / 1000000000 }}</td>
+            <td class="left">{{ node.Description.Resources.MemoryBytes | size }}</td>
+            <td class="left">{{ node.Description.Engine.EngineVersion }}</td>
+            <td class="left">{{ node.Status.Addr }}</td>
+            <td class="left">{{ node.Spec.Availability }}</td>
+            <td class="left">
+                <span class="label label-success" *ngIf="node.Status.State == 'ready'">{{ node.Status.State }}</span>
+                <span class="label label-danger" *ngIf="node.Status.State != 'ready'">{{ node.Status.State }}</span>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+
+<clr-modal [(clrModalOpen)]="_createNodeModalOpened">
+    <h3 class="modal-title">Add New Node</h3>
+    <div class="modal-body">
+        <pre><code>docker swarm join \
+    --token {{ swarm?.JoinTokens?.Worker }} \
+    {{ advertiseAddr }}</code></pre>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="_createNodeModalOpened = false">OK</button>
+    </div>
+</clr-modal>

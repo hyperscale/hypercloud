@@ -6,4 +6,5 @@ package config
 
 // DockerConfiguration struct
 type DockerConfiguration struct {
+	Host string
 }

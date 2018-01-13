@@ -1,4 +1,28 @@
 <clr-main-container>
+    <!-- TODO use observer for populate alert -->
+    <clr-alerts>
+        <clr-alert [clrAlertType]="'info'" [clrAlertAppLevel]="true">
+            <div class="alert-item">
+                <span class="alert-text">
+                    This is the first app level alert.
+                </span>
+                <div class="alert-actions">
+                    <button class="btn alert-action">Fix</button>
+                </div>
+            </div>
+        </clr-alert>
+        <clr-alert [clrAlertType]="'danger'" [clrAlertAppLevel]="true">
+            <div class="alert-item">
+                <span class="alert-text">
+                    This is a second app level alert.
+                </span>
+                <div class="alert-actions">
+                    <button class="btn alert-action">Fix</button>
+                </div>
+            </div>
+        </clr-alert>
+    </clr-alerts>
+
     <clr-header>
         <div class="branding">
             <a class="nav-link" routerLink="/">
@@ -28,9 +52,13 @@
                 <clr-icon clrVerticalNavIcon shape="dashboard"></clr-icon>
                 Dashboard
             </a>
-            <a clrVerticalNavLink routerLink="/collection" routerLinkActive="active">
+            <a clrVerticalNavLink routerLink="/stack" routerLinkActive="active">
                 <clr-icon clrVerticalNavIcon shape="organization"></clr-icon>
-                Collection
+                Stack
+            </a>
+            <a clrVerticalNavLink routerLink="/service" routerLinkActive="active">
+                <clr-icon clrVerticalNavIcon shape="organization"></clr-icon>
+                Service
             </a>
             <a clrVerticalNavLink routerLink="/node" routerLinkActive="active">
                 <clr-icon clrVerticalNavIcon shape="rack-server"></clr-icon>

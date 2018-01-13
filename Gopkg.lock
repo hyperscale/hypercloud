@@ -206,9 +206,21 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/gorilla/schema"
+  packages = ["."]
+  revision = "afe77393c53b66afe9212810d9b2013859d04ae6"
+
+[[projects]]
+  branch = "master"
   name = "github.com/hashicorp/hcl"
   packages = [".","hcl/ast","hcl/parser","hcl/scanner","hcl/strconv","hcl/token","json/parser","json/scanner","json/token"]
   revision = "23c074d0eceb2b8a5bfdbb271ab780cde70f05a8"
+
+[[projects]]
+  name = "github.com/imdario/mergo"
+  packages = ["."]
+  revision = "f1ac5984e69fed03e0574a92f70c59f132616ea2"
+  version = "0.3.0"
 
 [[projects]]
   branch = "master"
@@ -411,6 +423,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e175618a0ae7ab3a8819dd516846f1cfff9c42d7532c00de439e0ecd82f33e87"
+  inputs-digest = "3f8230b8ba79d84bec91b213c470b3565ee7b439cf3ae7c941a092d06e146b07"
   solver-name = "gps-cdcl"
   solver-version = 1
