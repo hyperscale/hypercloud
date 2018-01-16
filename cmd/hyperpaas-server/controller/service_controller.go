@@ -7,11 +7,16 @@ package controller
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
+	"github.com/docker/docker/api/types/filters"
+
 	"github.com/asdine/storm"
+	"github.com/docker/docker/api/types"
 	"github.com/euskadi31/go-server"
+	"github.com/euskadi31/go-sse"
 	"github.com/euskadi31/go-std"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
@@ -49,9 +54,13 @@ func NewServiceController(dockerClient *docker.Client, db *storm.DB, validator *
 
 // Mount endpoints
 func (c ServiceController) Mount(r *server.Router) {
+	events := sse.NewServer(c.getServiceStatsHandler)
+	events.SetRetry(time.Second * 5)
+
 	r.AddRouteFunc("/v1/services", c.getServicesHandler).Methods(http.MethodGet)
 	r.AddRouteFunc("/v1/services", c.postServiceHandler).Methods(http.MethodPost)
-	r.AddRouteFunc("/v1/services/{id:[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}}", c.getServiceHandler).Methods(http.MethodGet)
+	r.AddRouteFunc("/v1/services/{id:[0-9a-z]{25}}", c.getServiceHandler).Methods(http.MethodGet)
+	r.AddRoute("/v1/services/{id:[0-9a-z]{25}}/stats", events).Methods(http.MethodGet)
 }
 
 // swagger:route GET /v1/services Service getServicesHandler
@@ -62,7 +71,7 @@ func (c ServiceController) Mount(r *server.Router) {
 //       200: Service
 //
 func (c ServiceController) getServicesHandler(w http.ResponseWriter, r *http.Request) {
-	// ctx := r.Context()
+	ctx := r.Context()
 
 	query := &request.ServicesRequest{}
 
@@ -74,24 +83,21 @@ func (c ServiceController) getServicesHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	var services []*entity.Service
+	filter := filters.NewArgs()
 
 	if query.StackID != "" {
-		if err := c.db.Find("StackID", query.StackID, &services); err != nil {
-			log.Error().Err(err).Msgf("Get All Services by StackID: %s", query.StackID)
+		filter.Add("label", "com.docker.stack.namespace="+query.StackID)
+	}
 
-			server.FailureFromError(w, http.StatusInternalServerError, err)
+	services, err := c.dockerClient.ServiceList(ctx, types.ServiceListOptions{
+		Filters: filter,
+	})
+	if err != nil {
+		log.Error().Err(err).Msg("ServiceList")
 
-			return
-		}
-	} else {
-		if err := c.db.All(&services); err != nil {
-			log.Error().Err(err).Msg("Get All Services")
+		server.FailureFromError(w, http.StatusInternalServerError, err)
 
-			server.FailureFromError(w, http.StatusInternalServerError, err)
-
-			return
-		}
+		return
 	}
 
 	server.JSON(w, http.StatusOK, services)
@@ -159,19 +165,151 @@ func (c ServiceController) postServiceHandler(w http.ResponseWriter, r *http.Req
 //       200: Service
 //
 func (c ServiceController) getServiceHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
 	params := mux.Vars(r)
 
 	id := params["id"]
 
 	log.Debug().Msgf("Service ID: %s", id)
 
-	service := &entity.Service{}
-
-	if err := c.db.One("ID", id, service); err != nil {
+	service, _, err := c.dockerClient.ServiceInspectWithRaw(ctx, id, types.ServiceInspectOptions{})
+	if err != nil {
 		server.FailureFromError(w, http.StatusNotFound, err)
 
 		return
 	}
 
 	server.JSON(w, http.StatusOK, service)
+}
+
+// swagger:route GET /v1/services/{id}/stats Stack getServiceHandler
+//
+// Get stats for service by id
+//
+//     Responses:
+//       200: Service
+//
+func (c ServiceController) getServiceStatsHandler(rw sse.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	params := mux.Vars(r)
+
+	id := params["id"]
+
+	log.Debug().Msgf("Service ID: %s", id)
+
+	service, _, err := c.dockerClient.ServiceInspectWithRaw(ctx, id, types.ServiceInspectOptions{})
+	if err != nil {
+		log.Error().Err(err).Msg("ServiceInspectWithRaw")
+
+		return
+	}
+
+	filter := filters.NewArgs()
+	filter.Add("service", service.Spec.Name)
+	filter.Add("desired-state", "running")
+
+	tasks, err := c.dockerClient.TaskList(ctx, types.TaskListOptions{
+		Filters: filter,
+	})
+	if err != nil {
+		log.Error().Err(err).Msg("TaskList")
+
+		return
+	}
+
+	containers := []string{}
+
+	/*
+		swarm.Task{
+			ID:"mosbb0aw0oobw9atkrh2pjooj",
+			Meta:swarm.Meta{
+				Version:swarm.Version{Index:0xd2},
+				CreatedAt:time.Time{wall:0x6c64f62, ext:63651657051, loc:(*time.Location)(nil)},
+				UpdatedAt:time.Time{wall:0x1a3a8ec6, ext:63651657059, loc:(*time.Location)(nil)}
+			},
+			Annotations:swarm.Annotations{Name:"", Labels:map[string]string{}},
+			Spec:swarm.TaskSpec{
+				ContainerSpec:(*swarm.ContainerSpec)(0xc420270160),
+				PluginSpec:(*runtime.PluginSpec)(nil),
+				Resources:(*swarm.ResourceRequirements)(0xc4201cc060),
+				RestartPolicy:(*swarm.RestartPolicy)(0xc4203f6720),
+				Placement:(*swarm.Placement)(0xc42010c050),
+				Networks:[]swarm.NetworkAttachmentConfig{
+					swarm.NetworkAttachmentConfig{
+						Target:"lpq4pehw4foqeae2nlm2n6r05",
+						Aliases:[]string{"web"},
+						DriverOpts:map[string]string(nil)
+					}
+				},
+				LogDriver:(*swarm.Driver)(nil),
+				ForceUpdate:0x0,
+				Runtime:""
+			},
+			ServiceID:"pll7obzsx6aksevjl0oery6dq",
+			Slot:1,
+			NodeID:"g3z3mv1eunnqbgn1p1t9elfoq",
+			Status:swarm.TaskStatus{Timestamp:time.Time{wall:0x15c214f0, ext:63651657059, loc:(*time.Location)(nil)},
+			State:"running",
+			Message:"started",
+			Err:"",
+			ContainerStatus:swarm.ContainerStatus{
+				ContainerID:"54cc8bed986caf955c976006d603fe7e922c154cb5509b8c64797ee135aa3aea",
+				PID:2777,
+				ExitCode:0
+			},
+			PortStatus:swarm.PortStatus{Ports:[]swarm.PortConfig(nil)}}, DesiredState:"running", NetworksAttachments:[]swarm.NetworkAttachment{swarm.NetworkAttachment{Network:swarm.Network{ID:"lpq4pehw4foqeae2nlm2n6r05", Meta:swarm.Meta{Version:swarm.Version{Index:0xbc}, CreatedAt:time.Time{wall:0x17312498, ext:63651391082, loc:(*time.Location)(nil)}, UpdatedAt:time.Time{wall:0x38b511d, ext:63651657049, loc:(*time.Location)(nil)}},Spec:swarm.NetworkSpec{Annotations:swarm.Annotations{Name:"acme_frontend", Labels:map[string]string{"com.docker.stack.namespace":"acme"}}, DriverConfiguration:(*swarm.Driver)(0xc4200e2700), IPv6Enabled:false, Internal:false, Attachable:false, Ingress:false, IPAMOptions:(*swarm.IPAMOptions)(nil), ConfigFrom:(*network.ConfigReference)(nil), Scope:"swarm"}, DriverState:swarm.Driver{Name:"overlay", Options:map[string]string{"com.docker.network.driver.overlay.vxlanid_list":"4097"}}, IPAMOptions:(*swarm.IPAMOptions)(0xc4203f7050)}, Addresses:[]string{"10.0.0.6/24"}}}, GenericResources:[]swarm.GenericResource(nil)}
+	*/
+
+	for _, task := range tasks {
+		// log.Debug().Msgf("Task: %#v", task.ID)
+
+		containers = append(containers, task.Status.ContainerStatus.ContainerID)
+	}
+
+	events := make(chan json.RawMessage, len(containers)*2)
+
+	for _, container := range containers {
+		go func(container string) {
+			containerStats, err := c.dockerClient.ContainerStats(ctx, container, true)
+			if err != nil {
+				log.Error().Err(err).Msg("ContainerStats")
+
+				return
+			}
+
+			defer containerStats.Body.Close()
+
+			decoder := json.NewDecoder(containerStats.Body)
+
+			for {
+				//var stats types.StatsJSON
+				var stats json.RawMessage
+
+				if err := decoder.Decode(&stats); err == io.EOF {
+					break
+				} else if err != nil {
+					log.Error().Err(err).Msg("JSON Decoder")
+
+					return
+				}
+
+				events <- stats
+			}
+		}(container)
+	}
+
+	for {
+		select {
+		case stats := <-events:
+			rw.Send(&sse.MessageEvent{
+				Data: stats,
+			})
+		case <-rw.CloseNotify:
+			close(events)
+
+			return
+		}
+	}
 }

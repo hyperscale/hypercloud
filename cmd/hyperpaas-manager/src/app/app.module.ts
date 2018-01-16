@@ -15,6 +15,8 @@ import { ServiceListComponent } from './components/service/service-list.componen
 import { ServiceCreateComponent } from './components/service/service-create.component';
 import { ServiceDetailComponent } from './components/service/service-detail.component';
 import { ServiceDetailOverviewComponent } from './components/service/service-detail-overview.component';
+import { ServiceDetailMetricsComponent } from './components/service/service-detail-metrics.component';
+import { ServiceDetailSettingsComponent } from './components/service/service-detail-settings.component';
 import { ApplicationNameValidatorDirective } from './directives/application-name-validator.directive';
 import { StackListComponent } from './components/stack/stack-list.component';
 import { StackDetailComponent } from './components/stack/stack-detail.component';
@@ -28,6 +30,8 @@ import { TruncatePipe } from './pipes/truncate.pipe';
 import { SizePipe } from './pipes/size.pipe';
 import { ImagePipe } from './pipes/image.pipe';
 import { ContainerPortPipe } from './pipes/container-port.pipe';
+import { StackNamePipe } from './pipes/stack-name.pipe';
+import { ServiceNamePipe } from './pipes/service-name.pipe';
 
 @NgModule({
     declarations: [
@@ -39,13 +43,17 @@ import { ContainerPortPipe } from './pipes/container-port.pipe';
         ServiceCreateComponent,
         ServiceDetailComponent,
         ServiceDetailOverviewComponent,
+        ServiceDetailMetricsComponent,
+        ServiceDetailSettingsComponent,
         ApplicationNameValidatorDirective,
         StackListComponent,
         StackDetailComponent,
         TruncatePipe,
         SizePipe,
         ImagePipe,
-        ContainerPortPipe
+        ContainerPortPipe,
+        StackNamePipe,
+        ServiceNamePipe
     ],
     imports: [
         BrowserModule,
@@ -56,6 +64,7 @@ import { ContainerPortPipe } from './pipes/container-port.pipe';
         HttpModule
     ],
     providers: [
+        StackNamePipe,
         ApiService,
         StackService,
         ServiceService,

@@ -1,0 +1,27 @@
+<div class="row" *ngIf="stats$ | async as stats">
+    <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+            <div class="card-header">CPU</div>
+            <div class="card-block">
+                0%
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+            <div class="card-header">Memory</div>
+            <div class="card-block">
+                <div class="stats-value">{{ stats.memory.percent | number }}%</div>
+                <div class="stats-sub-value">{{ stats.memory.usage | size }} of {{ stats.memory.limit | size }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+            <div class="card-header">Tasks</div>
+            <div class="card-block">
+                0%
+            </div>
+        </div>
+    </div>
+</div>

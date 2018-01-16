@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { NgZone, Injectable } from '@angular/core';
 import { URLSearchParams } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
-import { Service } from '../entities/service';
+import { Subject } from 'rxjs/Subject';
+import { Service, StatsJSON } from '../entities/docker';
 import { ApiService } from './api.service';
 
 export interface ServicesQueryParams {
@@ -10,12 +11,14 @@ export interface ServicesQueryParams {
 
 @Injectable()
 export class ServiceService {
-    constructor(private apiService: ApiService) {}
+    private eventSource: any = window['EventSource'];
+
+    constructor(private apiService: ApiService, private ngZone: NgZone) {
+    }
 
     public getService(id: string): Promise<Service> {
         return this.apiService.get(`/v1/services/${id}`)
-        .then(response => response.json())
-        .then(response => Object.assign(new Service(), response));
+        .then(response => response.json() as Service);
     }
 
     public getServices(query?: ServicesQueryParams): Promise<Service[]> {
@@ -36,13 +39,26 @@ export class ServiceService {
         return this.apiService.get(url)
             .then(response => response.json())
             .then(response => {
-                return response.map(service => Object.assign(new Service(), service));
+                return response.map(service => service as Service);
             });
     }
 
     public create(service: Service): Promise<Service> {
         return this.apiService.post('/v1/services', service)
-            .then(response => response.json())
-            .then(response => Object.assign(new Service(), response));
+            .then(response => response.json() as Service);
+    }
+
+    public stats(id: string): Observable<StatsJSON> {
+        return new Observable<StatsJSON>(obs => {
+            const eventSource = new this.eventSource(this.apiService.getUrl(`/v1/services/${id}/stats`));
+
+            eventSource.onmessage = event => {
+                const data = JSON.parse(event.data) as StatsJSON;
+
+                this.ngZone.run(() => obs.next(data));
+            };
+
+            return () => eventSource.close();
+        });
     }
 }

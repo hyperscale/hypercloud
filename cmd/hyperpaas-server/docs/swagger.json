@@ -96,6 +96,20 @@
         }
       }
     },
+    "/v1/services/{id}/stats": {
+      "get": {
+        "description": "Get stats for service by id",
+        "tags": [
+          "Stack"
+        ],
+        "operationId": "getServiceHandler",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/Service"
+          }
+        }
+      }
+    },
     "/v1/stacks": {
       "get": {
         "description": "Get the stacks list",

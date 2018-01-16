@@ -92,6 +92,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/euskadi31/go-sse"
+  packages = ["."]
+  revision = "ccfe5887a1039478022b844538005286b854892c"
+
+[[projects]]
+  branch = "master"
   name = "github.com/euskadi31/go-std"
   packages = ["."]
   revision = "8d07a999356b3e7ea1b4ceb3303bacbeddd15e2d"
@@ -215,12 +221,6 @@
   name = "github.com/hashicorp/hcl"
   packages = [".","hcl/ast","hcl/parser","hcl/scanner","hcl/strconv","hcl/token","json/parser","json/scanner","json/token"]
   revision = "23c074d0eceb2b8a5bfdbb271ab780cde70f05a8"
-
-[[projects]]
-  name = "github.com/imdario/mergo"
-  packages = ["."]
-  revision = "f1ac5984e69fed03e0574a92f70c59f132616ea2"
-  version = "0.3.0"
 
 [[projects]]
   branch = "master"
@@ -423,6 +423,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "3f8230b8ba79d84bec91b213c470b3565ee7b439cf3ae7c941a092d06e146b07"
+  inputs-digest = "b61007bef557290e7a9fc4c988f5de4c6e4fce237e9a524219306fe83c0601d3"
   solver-name = "gps-cdcl"
   solver-version = 1

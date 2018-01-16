@@ -1,4 +1,4 @@
-<h2>Service {{ service?.name }}</h2>
+<h2>Service {{ service | serviceName }}</h2>
 
 <clr-tabs>
     <clr-tab>
@@ -32,7 +32,7 @@
         <button clrTabLink>Metrics</button>
         <ng-template [(clrIfActive)]="metricsActive">
             <clr-tab-content>
-                ...
+                <app-service-detail-metrics [service]="service"></app-service-detail-metrics>
             </clr-tab-content>
         </ng-template>
     </clr-tab>
@@ -50,7 +50,7 @@
         <button clrTabLink>Settings</button>
         <ng-template [(clrIfActive)]="settingsActive">
             <clr-tab-content>
-                ...
+                <app-service-detail-settings [service]="service"></app-service-detail-settings>
             </clr-tab-content>
         </ng-template>
     </clr-tab>

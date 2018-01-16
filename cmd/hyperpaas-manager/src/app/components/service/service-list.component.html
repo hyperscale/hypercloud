@@ -11,8 +11,8 @@
     </thead>
     <tbody>
         <tr *ngFor="let service of services">
-            <td class="left"><a [routerLink]="['/service/', service.id]">{{ service.name }}</a></td>
-            <td class="left">{{ service.created_at | date }}</td>
+            <td class="left"><a [routerLink]="['/service/', service.ID]">{{ service | serviceName }}</a></td>
+            <td class="left">{{ service.CreatedAt | date }}</td>
         </tr>
     </tbody>
 </table>
