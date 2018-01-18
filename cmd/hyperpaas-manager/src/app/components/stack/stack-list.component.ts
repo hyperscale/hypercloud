@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Stack } from '../../entities/stack';
+import { Stack } from '../../entities/docker';
 import { StackService } from '../../services/stack.service';
 
 @Component({
@@ -10,13 +10,18 @@ import { StackService } from '../../services/stack.service';
 export class StackListComponent implements OnInit {
     public stacks: Stack[] = [];
 
-    public stack: Stack = {};
+    public stack: Stack;
 
     public submitted = false;
 
     public _createStackModalOpened = false;
 
-    constructor(private stackService: StackService) { }
+    constructor(private stackService: StackService) {
+        this.stack = {
+            Name: '',
+            Services: 0,
+        };
+    }
 
     ngOnInit() {
         this.stackService.getStacks().then(stacks => this.stacks = stacks);
@@ -37,7 +42,10 @@ export class StackListComponent implements OnInit {
 
     onResetStack() {
         this._createStackModalOpened = false;
-        this.stack = {};
+        this.stack = {
+            Name: '',
+            Services: 0,
+        };
         this.submitted = false;
     }
 }

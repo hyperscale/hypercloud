@@ -1,7 +1,6 @@
 import { Component, OnInit, OnDestroy, OnChanges, EventEmitter, Input, Output, SimpleChanges} from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Stack } from '../../entities/stack';
-import { Service } from '../../entities/docker';
+import { Service, Stack } from '../../entities/docker';
 import { StackService } from '../../services/stack.service';
 import { ServiceService } from '../../services/service.service';
 

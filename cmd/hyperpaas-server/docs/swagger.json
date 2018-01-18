@@ -34,6 +34,20 @@
         "responses": {}
       }
     },
+    "/v1/events": {
+      "get": {
+        "description": "Get the event list",
+        "tags": [
+          "Event"
+        ],
+        "operationId": "getEventsHandler",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/Event"
+          }
+        }
+      }
+    },
     "/v1/nodes": {
       "get": {
         "description": "Get the nodes list",

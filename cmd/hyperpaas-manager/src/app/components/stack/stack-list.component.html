@@ -7,14 +7,12 @@
         <tr>
             <th class="left">Name</th>
             <th class="left">Services</th>
-            <th class="left">Created At</th>
         </tr>
     </thead>
     <tbody>
         <tr *ngFor="let stack of stacks">
-            <td class="left"><a [routerLink]="['/stack/', stack.id]">{{ stack.name }}</a></td>
-            <td class="left">{{ stack.services }}</td>
-            <td class="left">{{ stack.created_at | date }}</td>
+            <td class="left"><a [routerLink]="['/stack/', stack.Name]">{{ stack.Name }}</a></td>
+            <td class="left">{{ stack.Services }}</td>
         </tr>
     </tbody>
 </table>

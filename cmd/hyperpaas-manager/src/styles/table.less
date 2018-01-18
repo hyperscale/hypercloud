@@ -1,0 +1,21 @@
+.table.table-hybride {
+
+    tbody {
+        &:first-of-type {
+            tr {
+                &:first-child {
+                    th {
+                        border-top: inherit;
+                    }
+                }
+            }
+        }
+    }
+
+    thead {
+        th {
+            display: table-cell;
+            border-bottom: 1px solid #ccc;
+        }
+    }
+}

@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
-import { Stack } from '../../entities/stack';
-import { Service } from '../../entities/docker';
+import { Service, Stack } from '../../entities/docker';
 import { StackService } from '../../services/stack.service';
 import { ServiceService } from '../../services/service.service';
 
@@ -12,7 +11,7 @@ import { ServiceService } from '../../services/service.service';
 })
 export class StackDetailComponent implements OnInit {
     public stacks: Stack[] = [];
-    public stack: Stack = {};
+    public stack = '';
     public services: Service[] = [];
 
     constructor(
@@ -25,13 +24,10 @@ export class StackDetailComponent implements OnInit {
         this.activatedRoute.params.subscribe((params: Params) => {
             console.log('ID:', params['id']);
 
-            this.fetchStack(params['id']);
+            this.stack = params['id'];
+
             this.fetchServices(params['id']);
         });
-    }
-
-    private fetchStack(id: string) {
-        this.stackService.getStack(id).then(stack => this.stack = stack);
     }
 
     private fetchServices(id: string) {
@@ -39,6 +35,4 @@ export class StackDetailComponent implements OnInit {
             stack_id: id
         }).then(services => this.services = services);
     }
-
-
 }

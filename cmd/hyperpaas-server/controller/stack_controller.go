@@ -10,6 +10,8 @@ import (
 	"time"
 
 	"github.com/asdine/storm"
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/filters"
 	"github.com/euskadi31/go-server"
 	std "github.com/euskadi31/go-std"
 	"github.com/google/uuid"
@@ -43,8 +45,10 @@ func NewStackController(dockerClient *docker.Client, db *storm.DB, validator *se
 func (c StackController) Mount(r *server.Router) {
 	r.AddRouteFunc("/v1/stacks", c.getStacksHandler).Methods(http.MethodGet)
 	r.AddRouteFunc("/v1/stacks", c.postStacksHandler).Methods(http.MethodPost)
-	r.AddRouteFunc("/v1/stacks/{id:[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}}", c.getStackHandler).Methods(http.MethodGet)
-	r.AddRouteFunc("/v1/stacks/{id:[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}}/services", c.getStackServicesHandler).Methods(http.MethodGet)
+	// r.AddRouteFunc("/v1/stacks/{id:[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}}", c.getStackHandler).Methods(http.MethodGet)
+	// r.AddRouteFunc("/v1/stacks/{id:[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}}/services", c.getStackServicesHandler).Methods(http.MethodGet)
+
+	r.AddRouteFunc("/v1/stacks/{id:[a-z]+(?:-[a-z0-9]+)*}/services", c.getStackServicesHandler).Methods(http.MethodGet)
 }
 
 // swagger:route GET /v1/stacks Stack getStacksHandler
@@ -55,20 +59,30 @@ func (c StackController) Mount(r *server.Router) {
 //       200: Stack
 //
 func (c StackController) getStacksHandler(w http.ResponseWriter, r *http.Request) {
-	var stacks []*entity.Stack
+	ctx := r.Context()
 
-	if err := c.db.All(&stacks); err != nil {
-		log.Error().Err(err).Msg("Get All Stacks")
+	stackMap := map[string]*docker.Stack{}
 
-		server.FailureFromError(w, http.StatusInternalServerError, err)
+	{
+		var stacks []*entity.Stack
 
-		return
+		if err := c.db.All(&stacks); err != nil {
+			log.Error().Err(err).Msg("Get All Stacks")
+
+			server.FailureFromError(w, http.StatusInternalServerError, err)
+
+			return
+		}
+
+		for _, stack := range stacks {
+			stackMap[stack.Name] = &docker.Stack{
+				Name:     stack.Name,
+				Services: 0,
+			}
+		}
 	}
 
-	server.JSON(w, http.StatusOK, stacks)
-	/*
-		ctx := r.Context()
-
+	{
 		stacks, err := c.dockerClient.StackList(ctx)
 		if err != nil {
 			log.Error().Err(err).Msg("StackList")
@@ -78,11 +92,18 @@ func (c StackController) getStacksHandler(w http.ResponseWriter, r *http.Request
 			return
 		}
 
+		for _, stack := range stacks {
+			stackMap[stack.Name] = &stack
+		}
+	}
 
+	response := []*docker.Stack{}
 
-		server.JSON(w, http.StatusOK, stacks)
+	for _, stack := range stackMap {
+		response = append(response, stack)
+	}
 
-	*/
+	server.JSON(w, http.StatusOK, response)
 }
 
 // swagger:route POST /v1/stacks Stack postStacksHandler
@@ -170,16 +191,22 @@ func (c StackController) getStackHandler(w http.ResponseWriter, r *http.Request)
 //       200: Service
 //
 func (c StackController) getStackServicesHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
 	params := mux.Vars(r)
 
 	id := params["id"]
 
 	log.Debug().Msgf("Stack ID: %s", id)
 
-	var services []*entity.Service
+	filter := filters.NewArgs()
+	filter.Add("label", "com.docker.stack.namespace="+id)
 
-	if err := c.db.Find("StackID", id, &services); err != nil {
-		log.Error().Err(err).Msgf("Get All Services for StackID: %s", id)
+	services, err := c.dockerClient.ServiceList(ctx, types.ServiceListOptions{
+		Filters: filter,
+	})
+	if err != nil {
+		log.Error().Err(err).Msg("ServiceList")
 
 		server.FailureFromError(w, http.StatusInternalServerError, err)
 

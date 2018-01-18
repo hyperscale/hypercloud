@@ -33,7 +33,7 @@ export interface NodeEngine {
 }
 
 export interface NodeStatus {
-    State: string;
+    State: 'unknown' | 'down' | 'ready' | 'disconnected';
 }
 
 export interface NodeManagerStatus {
@@ -58,6 +58,7 @@ export interface Node {
     UpdatedAt: Date;
     Spec: NodeSpec;
     Description: NodeDescription;
+    Status?: NodeStatus;
 }
 
 export interface JoinTokens {
@@ -201,7 +202,8 @@ export interface NetworkAttachmentConfig {
 }
 
 export interface Mode {
-    Replicated: Replicated;
+    Replicated?: Replicated;
+    Global?: any;
 }
 
 export interface Replicated {
@@ -218,19 +220,20 @@ export interface UpdateConfig {
 
 export interface EndpointSpecOrSpec {
     Mode: string;
-    Ports?: (PortsEntity)[] | null;
+    Ports?: (PortConfig)[] | null;
 }
 
-export interface PortsEntity {
-    Protocol: string;
-    TargetPort: number;
-    PublishedPort: number;
-    PublishMode: string;
+export interface PortConfig {
+    Name?: string;
+    Protocol?: string;
+    TargetPort?: number;
+    PublishedPort?: number;
+    PublishMode?: string;
 }
 
 export interface Endpoint {
     Spec: EndpointSpecOrSpec;
-    Ports?: (PortsEntity)[] | null;
+    Ports?: (PortConfig)[] | null;
     VirtualIPs?: (VirtualIPsEntity)[] | null;
 }
 
@@ -415,4 +418,160 @@ export interface StatsJSON extends Stats {
 
     // Networks request version >=1.21
     networks?: { [key: string]: NetworkStats };
+}
+
+// Actor describes something that generates events,
+// like a container, or a network, or a volume.
+// It has a defined name and a set or attributes.
+// The container attributes are its labels, other actors
+// can generate these attributes from other properties.
+export interface Actor {
+    ID: string;
+    Attributes: { [key: string]: string };
+}
+
+// Message represents the information an event contains
+export interface Message {
+    // Deprecated information from JSONMessage.
+    // With data only in container events.
+    status?: string;
+    id?: string;
+    from?: string;
+
+    Type: 'container' | 'daemon' | 'image' | 'network' | 'plugin' | 'volume' | 'service' | 'node' | 'secret' | 'config';
+    Action: string;
+    Actor: Actor;
+    // Engine events are local scope. Cluster events are swarm scope.
+    scope?: string;
+
+    time?: number;
+    timeNano?: number;
+}
+
+export interface Stack {
+    Name: string;
+    Services: number;
+}
+
+export interface VersionResponse {
+    ApiVersion: string;
+    Arch: string;
+    BuildTime: string;
+    Experimental: boolean;
+    GitCommit: string;
+    GoVersion: string;
+    KernelVersion: string;
+    MinAPIVersion: string;
+    Os: string;
+    Version: string;
+}
+
+export type TaskState =
+    'new' |
+    'allocated' |
+    'pending' |
+    'assigned' |
+    'accepted' |
+    'preparing' |
+    'ready' |
+    'starting' |
+    'running' |
+    'complete' |
+    'shutdown' |
+    'failed' |
+    'rejected';
+
+export interface ContainerStatus {
+    ContainerID?: string;
+    PID?: number;
+    ExitCode?: number;
+}
+
+export interface PortStatus {
+    Ports?: PortConfig[];
+}
+
+export interface TaskStatus {
+    Timestamp?: string;
+    State?: TaskState;
+    Message?: string;
+    Err?: string;
+    ContainerStatus?: ContainerStatus;
+    PortStatus?: PortStatus;
+}
+
+export interface Driver {
+    Name?: string;
+    Options: { [key: string]: string };
+}
+
+
+export interface IPAMConfig {
+    Subnet?: string;
+    Range?: string;
+    Gateway?: string;
+}
+
+export interface IPAMOptions {
+    Driver?: Driver;
+    Configs?: IPAMConfig[];
+}
+
+export interface ConfigReference {
+    Network: string;
+}
+
+export interface NetworkSpec {
+    Name: string;
+    Labels: { [key: string]: string };
+    DriverConfiguration?: Driver;
+    IPv6Enabled?: boolean;
+    Internal?: boolean;
+    Attachable?: boolean;
+    Ingress?: boolean;
+    IPAMOptions?: IPAMOptions;
+    ConfigFrom?: ConfigReference;
+    Scope?: string;
+}
+
+export interface Network {
+    ID: string;
+    Version: Version;
+    CreatedAt: string;
+    UpdatedAt: string;
+    Spec?: NetworkSpec;
+    DriverState?: Driver;
+    IPAMOptions?: IPAMOptions;
+}
+
+export interface NetworkAttachment {
+    Network?: Network;
+    Addresses?: string[];
+}
+
+export interface Task {
+    ID: string;
+    Version: Version;
+    CreatedAt: string;
+    UpdatedAt: string;
+    Name: string;
+    Labels: { [key: string]: string };
+    Spec?: TaskSpec;
+    ServiceID?: string;
+    Slot?: number;
+    NodeID?: string;
+    Status?: TaskStatus;
+    DesiredState?: TaskState;
+    NetworksAttachments?: NetworkAttachment[];
+    GenericResources?: GenericResource[];
+}
+
+export interface ReplicasInfo {
+    Running: number;
+    Desired: number;
+}
+
+export interface ServiceInfo {
+    Mode: string;
+    Replicas: ReplicasInfo;
 }

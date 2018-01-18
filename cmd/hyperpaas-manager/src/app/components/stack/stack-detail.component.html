@@ -1,4 +1,4 @@
-<h2>Stack {{ stack?.name }}</h2>
+<h2>Stack {{ stack }}</h2>
 
 <a class="btn btn-sm btn-outline" routerLink="/service/create" [queryParams]="{stack_id: stack.id}">Create new service</a>
 
@@ -11,8 +11,8 @@
     </thead>
     <tbody>
         <tr *ngFor="let service of services">
-            <td class="left"><a [routerLink]="['/service/', service.id]">{{ service.name }}</a></td>
-            <td class="left">{{ service.created_at | date }}</td>
+            <td class="left"><a [routerLink]="['/service/', service.ID]">{{ service | serviceName }}</a></td>
+            <td class="left">{{ service.CreatedAt | date }}</td>
         </tr>
     </tbody>
 </table>

@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Service } from '../../entities/docker';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
     selector: 'app-service-detail-overview',
@@ -6,9 +8,11 @@ import { Component, OnInit } from '@angular/core';
     styleUrls: ['./service-detail-overview.component.less']
 })
 export class ServiceDetailOverviewComponent implements OnInit {
-    constructor() { }
+    service: Service;
+
+    constructor(private route: ActivatedRoute) { }
 
     ngOnInit() {
-
+        this.service = this.route.snapshot.parent.data['service'];
     }
 }

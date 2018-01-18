@@ -10,7 +10,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './components/app/app.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { CollectionComponent } from './components/collection/collection.component';
-import { NodeListComponent } from './components/node/node-list.component';
+import { ClusterDetailComponent } from './components/cluster/cluster-detail.component';
 import { ServiceListComponent } from './components/service/service-list.component';
 import { ServiceCreateComponent } from './components/service/service-create.component';
 import { ServiceDetailComponent } from './components/service/service-detail.component';
@@ -25,6 +25,7 @@ import { ApiService } from './services/api.service';
 import { StackService } from './services/stack.service';
 import { ServiceService } from './services/service.service';
 import { NodeService } from './services/node.service';
+import { EventService } from './services/event.service';
 
 import { TruncatePipe } from './pipes/truncate.pipe';
 import { SizePipe } from './pipes/size.pipe';
@@ -33,12 +34,14 @@ import { ContainerPortPipe } from './pipes/container-port.pipe';
 import { StackNamePipe } from './pipes/stack-name.pipe';
 import { ServiceNamePipe } from './pipes/service-name.pipe';
 
+import { ServiceResolver } from './resolvers/service.resolver';
+
 @NgModule({
     declarations: [
         AppComponent,
         DashboardComponent,
         CollectionComponent,
-        NodeListComponent,
+        ClusterDetailComponent,
         ServiceListComponent,
         ServiceCreateComponent,
         ServiceDetailComponent,
@@ -69,6 +72,8 @@ import { ServiceNamePipe } from './pipes/service-name.pipe';
         StackService,
         ServiceService,
         NodeService,
+        EventService,
+        ServiceResolver
     ],
     bootstrap: [AppComponent]
 })

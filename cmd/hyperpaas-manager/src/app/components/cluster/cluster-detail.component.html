@@ -1,3 +1,26 @@
+<h2>Cluster status</h2>
+
+<table class="table table-vertical">
+    <tbody>
+        <tr>
+            <th>Nodes</th>
+            <td>{{ cluster.nodes }}</td>
+        </tr>
+        <tr>
+            <th>Docker API version</th>
+            <td>{{ cluster.version }}</td>
+        </tr>
+        <tr>
+            <th>Total CPU</th>
+            <td>{{ cluster.cpu / 1000000000 }}</td>
+        </tr>
+        <tr>
+            <th>Total memory</th>
+            <td>{{ cluster.memory | size }}</td>
+        </tr>
+    </tbody>
+</table>
+
 <h2>Nodes</h2>
 
 <button class="btn btn-sm btn-outline" (click)="_createNodeModalOpened = true">Add New Node</button>

@@ -70,6 +70,37 @@
     </div>
 </section>
 
+<section class="section-resource">
+    <div class="row">
+        <div class="col-sm-4">
+            <h4>Resources</h4>
+        </div>
+        <div class="col-sm-7 offset-sm-1">
+            <table class="table table-vertical table-hybride">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th class="left">CPU</th>
+                        <th>Memory</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngIf="service?.Spec.TaskTemplate.Resources?.Reservations">
+                        <th class="left">Reserved</th>
+                        <td class="left">{{ service?.Spec.TaskTemplate.Resources?.Reservations.NanoCPUs / 1000000000 }}%</td>
+                        <td class="left">{{ service?.Spec.TaskTemplate.Resources?.Reservations.MemoryBytes | size }}</td>
+                    </tr>
+                    <tr *ngIf="service?.Spec.TaskTemplate.Resources?.Limits">
+                        <th class="left">Limited</th>
+                        <td class="left">{{ service?.Spec.TaskTemplate.Resources?.Limits.NanoCPUs / 1000000000 }}%</td>
+                        <td class="left">{{ service?.Spec.TaskTemplate.Resources?.Limits.MemoryBytes | size }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
 
 <section class="section-domain">
     <div class="row">

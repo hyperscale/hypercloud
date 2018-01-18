@@ -1,58 +1,26 @@
 <h2>Service {{ service | serviceName }}</h2>
 
-<clr-tabs>
-    <clr-tab>
-        <button clrTabLink>Overview</button>
-        <ng-template [(clrIfActive)]="overviewActive">
-            <clr-tab-content>
-                <app-service-detail-overview></app-service-detail-overview>
-            </clr-tab-content>
-        </ng-template>
-    </clr-tab>
+<ul class="nav" role="tablist">
+    <li role="presentation" class="nav-item">
+        <button class="btn btn-link nav-link" type="button" [routerLink]="['overview']" routerLinkActive="active">Overview</button>
+    </li>
+    <li role="presentation" class="nav-item">
+        <button class="btn btn-link nav-link" type="button" [routerLink]="['resources']" routerLinkActive="active">Resources</button>
+    </li>
+    <li role="presentation" class="nav-item">
+        <button class="btn btn-link nav-link" type="button" [routerLink]="['deploy']" routerLinkActive="active">Deploy</button>
+    </li>
+    <li role="presentation" class="nav-item">
+        <button class="btn btn-link nav-link" type="button" [routerLink]="['metrics']" routerLinkActive="active">Metrics</button>
+    </li>
+    <li role="presentation" class="nav-item">
+        <button class="btn btn-link nav-link" type="button" [routerLink]="['activity']" routerLinkActive="active">Activity</button>
+    </li>
+    <li role="presentation" class="nav-item">
+        <button class="btn btn-link nav-link" type="button" [routerLink]="['settings']" routerLinkActive="active">Settings</button>
+    </li>
+</ul>
+<section role="tabpanel">
+    <router-outlet></router-outlet>
+</section>
 
-    <clr-tab>
-        <button clrTabLink>Resources</button>
-        <ng-template [(clrIfActive)]="resourcesActive">
-            <clr-tab-content>
-                ...q
-            </clr-tab-content>
-        </ng-template>
-    </clr-tab>
-
-    <clr-tab>
-        <button clrTabLink>Deploy</button>
-        <ng-template [(clrIfActive)]="deployActive">
-            <clr-tab-content>
-                ...
-            </clr-tab-content>
-        </ng-template>
-    </clr-tab>
-
-    <clr-tab>
-        <button clrTabLink>Metrics</button>
-        <ng-template [(clrIfActive)]="metricsActive">
-            <clr-tab-content>
-                <app-service-detail-metrics [service]="service"></app-service-detail-metrics>
-            </clr-tab-content>
-        </ng-template>
-    </clr-tab>
-
-    <clr-tab>
-        <button clrTabLink>Activity</button>
-        <ng-template [(clrIfActive)]="activityActive">
-            <clr-tab-content>
-                ...
-            </clr-tab-content>
-        </ng-template>
-    </clr-tab>
-
-    <clr-tab>
-        <button clrTabLink>Settings</button>
-        <ng-template [(clrIfActive)]="settingsActive">
-            <clr-tab-content>
-                <app-service-detail-settings [service]="service"></app-service-detail-settings>
-            </clr-tab-content>
-        </ng-template>
-    </clr-tab>
-
-</clr-tabs>
