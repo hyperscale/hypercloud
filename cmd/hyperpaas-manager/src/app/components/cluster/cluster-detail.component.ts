@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Node, Swarm, Info } from '../../entities/docker';
-import { NodeService } from '../../services/node.service';
+import { Node, Swarm, Info } from '../../entities';
+import { DockerService } from '../../services';
 
 interface ClusterInfo {
     cpu: number;
@@ -23,7 +23,7 @@ export class ClusterDetailComponent implements OnInit {
 
     public _createNodeModalOpened = false;
 
-    constructor(private nodeService: NodeService) {
+    constructor(private dockerService: DockerService) {
         this.nodes = [];
 
         this.cluster = {
@@ -35,11 +35,11 @@ export class ClusterDetailComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.nodeService.getVersion().then(version => {
+        this.dockerService.getVersion().then(version => {
             this.cluster.version = version.ApiVersion;
         });
 
-        this.nodeService.getInfo().then(info => {
+        this.dockerService.getInfo().then(info => {
             this.info = info;
 
             info.Swarm.RemoteManagers.forEach(item => {
@@ -49,9 +49,9 @@ export class ClusterDetailComponent implements OnInit {
             });
         });
 
-        this.nodeService.getSwarm().then(swarm => this.swarm = swarm);
+        this.dockerService.getSwarm().then(swarm => this.swarm = swarm);
 
-        this.nodeService.getNodes().then(nodes => {
+        this.dockerService.getNodes().then(nodes => {
             console.log(nodes);
             this.nodes = nodes;
 

@@ -9,23 +9,43 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
-
-	"github.com/docker/docker/api/types/filters"
 
 	"github.com/asdine/storm"
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/filters"
+	"github.com/docker/docker/api/types/swarm"
 	"github.com/euskadi31/go-server"
 	"github.com/euskadi31/go-sse"
-	"github.com/euskadi31/go-std"
-	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/schema"
 	"github.com/hyperscale/hyperpaas/database/entity"
 	"github.com/hyperscale/hyperpaas/docker"
 	"github.com/hyperscale/hyperpaas/http/request"
+	"github.com/hyperscale/hyperpaas/http/response"
 	"github.com/rs/zerolog/log"
 )
+
+type ServiceHosts map[string]bool
+
+func (h ServiceHosts) Add(host string) {
+	if _, ok := h[host]; ok {
+		return
+	}
+
+	h[host] = true
+}
+
+func (h ServiceHosts) String() string {
+	hosts := []string{}
+
+	for host := range h {
+		hosts = append(hosts, host)
+	}
+
+	return fmt.Sprintf("Host:%s", strings.Join(hosts, ","))
+}
 
 // ServiceController struct
 type ServiceController struct {
@@ -73,7 +93,7 @@ func (c ServiceController) Mount(r *server.Router) {
 func (c ServiceController) getServicesHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	query := &request.ServicesRequest{}
+	query := &request.ServicesQuery{}
 
 	if err := c.queryDecoder.Decode(query, r.URL.Query()); err != nil {
 		log.Error().Err(err).Msg("Decode query parameters")
@@ -106,25 +126,14 @@ func (c ServiceController) getServicesHandler(w http.ResponseWriter, r *http.Req
 // swagger:route POST /v1/services Service postServiceHandler
 //
 // Create service
-//
+//     Request: ServiceCreateRequest
 //     Responses:
 //       201: Service
 //
 func (c ServiceController) postServiceHandler(w http.ResponseWriter, r *http.Request) {
-	// ctx := r.Context()
+	ctx := r.Context()
 
-	id, err := uuid.NewRandom()
-	if err != nil {
-		log.Error().Err(err).Msg("uuid.NewRandom")
-
-		server.FailureFromError(w, http.StatusInternalServerError, err)
-
-		return
-	}
-
-	service := &entity.Service{
-		ID: id.String(),
-	}
+	service := &request.ServiceCreateRequest{}
 
 	if err := json.NewDecoder(r.Body).Decode(service); err != nil {
 		log.Error().Err(err).Msg("Decode body request")
@@ -142,19 +151,57 @@ func (c ServiceController) postServiceHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	service.Hosts = append(service.Hosts, fmt.Sprintf("%s.%s", service.Name, "hyperpaas.service"))
+	hosts := ServiceHosts{}
 
-	service.CreatedAt = std.DateTimeFrom(time.Now().UTC())
+	hosts.Add(fmt.Sprintf("%s.%s", service.Name, "hyperpaas.service"))
 
-	if err := c.db.Save(service); err != nil {
-		log.Error().Err(err).Msg("Save Service")
+	spec := swarm.ServiceSpec{
+		Annotations: swarm.Annotations{
+			Name: service.GetServiceName(),
+			Labels: map[string]string{
+				docker.LabelStackNamespace:     service.StackID,
+				"traefik.docker.network":       "traefik-net",
+				"traefik.enable":               "true",
+				"traefik.frontend.entryPoints": "https",
+				"traefik.frontend.rule":        hosts.String(),
+				"traefik.port":                 "80",
+			},
+		},
+		TaskTemplate: swarm.TaskSpec{
+			ContainerSpec: &swarm.ContainerSpec{
+				Image: "dockercloud/hello-world:latest",
+				Labels: map[string]string{
+					docker.LabelStackNamespace: service.StackID,
+				},
+				Env: []string{
+					"PORT=80",
+				},
+				// Isolation: container.IsolationDefault,
+			},
+		},
+	}
+
+	resp, err := c.dockerClient.ServiceCreate(ctx, spec, types.ServiceCreateOptions{})
+	if err != nil {
+		log.Error().Err(err).Msg("Docker Service Create")
 
 		server.FailureFromError(w, http.StatusInternalServerError, err)
 
 		return
 	}
 
-	server.JSON(w, http.StatusCreated, service)
+	log.Info().Msgf("Service ID: %s", resp.ID)
+
+	for _, w := range resp.Warnings {
+		log.Warn().Msg(w)
+	}
+
+	// service.Hosts = append(service.Hosts, fmt.Sprintf("%s.%s", service.Name, "hyperpaas.service"))
+
+	server.JSON(w, http.StatusCreated, response.ServiceCreateResponse{
+		ServiceCreateRequest: service,
+		ID:                   resp.ID,
+	})
 }
 
 // swagger:route GET /v1/services/{id} Stack getServiceHandler

@@ -3,7 +3,7 @@
 <button class="btn btn-sm btn-outline" (click)="_createStackModalOpened = true">Create New Stack</button>
 
 <table class="table">
-    <thead>
+    <thead *ngIf="stacks.length > 0">
         <tr>
             <th class="left">Name</th>
             <th class="left">Services</th>
@@ -14,8 +14,12 @@
             <td class="left"><a [routerLink]="['/stack/', stack.Name]">{{ stack.Name }}</a></td>
             <td class="left">{{ stack.Services }}</td>
         </tr>
+        <tr *ngIf="stacks.length === 0">
+            <td colspan="2">Empty</td>
+        </tr>
     </tbody>
 </table>
+
 
 <clr-modal [(clrModalOpen)]="_createStackModalOpened">
     <h3 class="modal-title">Create New Stack</h3>
@@ -30,7 +34,7 @@
                         <input type="text" id="stackName" placeholder="stack-name"
                             required
                             minlength="3"
-                            pattern="^[a-z]+(?:-[a-z0-9]+)*$"
+                            pattern="^[a-z][a-z0-9_]+$"
                             name="stackName"
                             [(ngModel)]="stack.name"
                             #stackNameInput="ngModel" />

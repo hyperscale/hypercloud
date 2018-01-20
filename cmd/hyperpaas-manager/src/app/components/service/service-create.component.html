@@ -7,7 +7,7 @@
             <label for="serviceStack" class="required">Stack Name</label>
             <div class="select">
                 <select id="serviceStack" [(ngModel)]="service.stack_id" name="serviceStack">
-                    <option *ngFor="let stack of stacks" [ngValue]="stack.id" [selected]="stack.id === service?.stack_id">{{ stack.name }}</option>
+                    <option *ngFor="let stack of stacks" [ngValue]="stack.Name" [selected]="stack.Name === service.stack_id">{{ stack.Name }}</option>
                 </select>
             </div>
         </div>
@@ -18,7 +18,7 @@
                 <input type="text" id="serviceName" placeholder="app-name"
                     required
                     minlength="3"
-                    pattern="^[a-z]+(?:-[a-z0-9]+)*$"
+                    pattern="^[a-z][a-z0-9_]+$"
                     name="serviceName"
                     [(ngModel)]="service.name"
                     #serviceNameInput="ngModel" />

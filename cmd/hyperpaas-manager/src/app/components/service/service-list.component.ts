@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Service, ServiceInfo } from '../../entities/docker';
-import { ServiceService } from '../../services/service.service';
-import { NodeService } from '../../services/node.service';
-import { unescape } from 'querystring';
+import { Service, ServiceInfo } from '../../entities';
+import { ServiceService, DockerService } from '../../services';
 
 @Component({
     selector: 'app-service-list',
@@ -13,7 +11,7 @@ export class ServiceListComponent implements OnInit {
     public services: Service[] = [];
     public serviceInfo: { [key: string]: ServiceInfo };
 
-    constructor(private serviceService: ServiceService, private nodeService: NodeService) {
+    constructor(private serviceService: ServiceService, private dockerService: DockerService) {
         this.serviceInfo = {};
     }
 
@@ -27,7 +25,7 @@ export class ServiceListComponent implements OnInit {
 
             return services;
         }).then(services => {
-            return this.nodeService.getNodes();
+            return this.dockerService.getNodes();
         }).then(nodes => {
             nodes.forEach(node => {
                 if (node.Status.State !== 'down') {
@@ -37,7 +35,7 @@ export class ServiceListComponent implements OnInit {
 
             return nodes;
         }).then(nodes => {
-            return this.nodeService.getTasks();
+            return this.dockerService.getTasks();
         }).then(tasks => {
             tasks.forEach(task => {
                 if (task.DesiredState !== 'shutdown') {
@@ -65,7 +63,7 @@ export class ServiceListComponent implements OnInit {
                                 Desired: service.Spec.Mode.Replicated.Replicas,
                             }
                         };
-                    } else if (service.Spec.Mode.Global !== unescape) {
+                    } else if (service.Spec.Mode.Global !== undefined) {
                         this.serviceInfo[service.ID] = {
                             Mode: 'global',
                             Replicas: {

@@ -84,7 +84,7 @@
         }
       },
       "post": {
-        "description": "Create service",
+        "description": "Create service\nRequest: ServiceCreateRequest",
         "tags": [
           "Service"
         ],
@@ -177,6 +177,20 @@
           }
         }
       }
+    },
+    "/v1/version/latest": {
+      "get": {
+        "description": "Get the latest version",
+        "tags": [
+          "Version"
+        ],
+        "operationId": "getVersionEventHandler",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/Version"
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -228,35 +242,18 @@
       "type": "object",
       "title": "Stack represents a Stack.",
       "required": [
-        "name"
+        "Name"
       ],
       "properties": {
-        "created_at": {
-          "type": "string",
-          "format": "date-time",
-          "x-go-name": "CreatedAt"
-        },
-        "id": {
-          "type": "string",
-          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
-          "x-go-name": "ID"
-        },
-        "name": {
+        "Name": {
           "description": "Stack name.",
           "type": "string",
           "minLength": 3,
-          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
-          "x-go-name": "Name"
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
         },
-        "services": {
+        "Services": {
           "type": "integer",
-          "format": "int64",
-          "x-go-name": "Services"
-        },
-        "version": {
-          "type": "integer",
-          "format": "int64",
-          "x-go-name": "Version"
+          "format": "int64"
         }
       },
       "x-go-package": "github.com/hyperscale/hyperpaas/database/entity"

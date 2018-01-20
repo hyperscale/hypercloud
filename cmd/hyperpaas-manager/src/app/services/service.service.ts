@@ -2,7 +2,7 @@ import { NgZone, Injectable } from '@angular/core';
 import { URLSearchParams } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
-import { Service, StatsJSON } from '../entities/docker';
+import { Service, StatsJSON, ServiceRequest } from '../entities';
 import { ApiService } from './api.service';
 
 export interface ServicesQueryParams {
@@ -43,7 +43,7 @@ export class ServiceService {
             });
     }
 
-    public create(service: Service): Promise<Service> {
+    public create(service: ServiceRequest): Promise<Service> {
         return this.apiService.post('/v1/services', service)
             .then(response => response.json() as Service);
     }

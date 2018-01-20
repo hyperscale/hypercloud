@@ -1,8 +1,7 @@
 import { Component, OnInit, OnDestroy, OnChanges, EventEmitter, Input, Output, SimpleChanges} from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Service, Stack } from '../../entities/docker';
-import { StackService } from '../../services/stack.service';
-import { ServiceService } from '../../services/service.service';
+import { Stack, ServiceRequest } from '../../entities';
+import { StackService, ServiceService } from '../../services';
 
 @Component({
     selector: 'app-service-create',
@@ -10,8 +9,12 @@ import { ServiceService } from '../../services/service.service';
     styleUrls: ['./service-create.component.less']
 })
 export class ServiceCreateComponent implements OnInit, OnDestroy {
-    public service: Service;
+    public service: ServiceRequest = {
+        stack_id: '',
+        name: ''
+    };
     public stacks: Stack[] = [];
+    public stack = '';
 
     public submitted = false;
 
@@ -30,7 +33,10 @@ export class ServiceCreateComponent implements OnInit, OnDestroy {
     }
 
     onReset() {
-        this.service = null;
+        this.service = {
+            stack_id: '',
+            name: ''
+        };
         this.submitted = false;
     }
 

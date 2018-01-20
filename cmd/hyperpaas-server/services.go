@@ -42,6 +42,7 @@ const (
 	ServiceNodeControllerKey            = "service.controller.node"
 	ServiceDockerControllerKey          = "service.controller.docker"
 	ServiceEventControllerKey           = "service.controller.event"
+	ServiceVersionControllerKey         = "service.controller.version"
 	ServiceValidatorKey                 = "service.validator"
 	ServiceDBKey                        = "service.db.storm"
 )
@@ -198,6 +199,15 @@ func init() {
 		return controller
 	})
 
+	container.Set(ServiceVersionControllerKey, func(c *service.Container) interface{} {
+		controller, err := controller.NewVersionController()
+		if err != nil {
+			log.Fatal().Err(err).Msg(ServiceVersionControllerKey)
+		}
+
+		return controller
+	})
+
 	container.Set(ServiceDockerControllerKey, func(c *service.Container) interface{} {
 		cfg := c.Get(ServiceConfigKey).(*config.Configuration)
 
@@ -249,6 +259,7 @@ func init() {
 		stackController := c.Get(ServiceStackControllerKey).(server.Controller)
 		dockerController := c.Get(ServiceDockerControllerKey).(server.Controller)
 		eventController := c.Get(ServiceEventControllerKey).(server.Controller)
+		versionController := c.Get(ServiceVersionControllerKey).(server.Controller)
 
 		router := server.NewRouter()
 
@@ -318,6 +329,7 @@ func init() {
 		router.AddController(stackController)
 		router.AddController(dockerController)
 		router.AddController(eventController)
+		router.AddController(versionController)
 
 		return router
 	})

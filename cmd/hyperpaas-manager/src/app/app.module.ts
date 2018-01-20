@@ -9,7 +9,6 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { AppComponent } from './components/app/app.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
-import { CollectionComponent } from './components/collection/collection.component';
 import { ClusterDetailComponent } from './components/cluster/cluster-detail.component';
 import { ServiceListComponent } from './components/service/service-list.component';
 import { ServiceCreateComponent } from './components/service/service-create.component';
@@ -21,18 +20,22 @@ import { ApplicationNameValidatorDirective } from './directives/application-name
 import { StackListComponent } from './components/stack/stack-list.component';
 import { StackDetailComponent } from './components/stack/stack-detail.component';
 
-import { ApiService } from './services/api.service';
-import { StackService } from './services/stack.service';
-import { ServiceService } from './services/service.service';
-import { NodeService } from './services/node.service';
-import { EventService } from './services/event.service';
+import {
+    ApiService,
+    StackService,
+    ServiceService,
+    DockerService,
+    EventService
+} from './services';
 
-import { TruncatePipe } from './pipes/truncate.pipe';
-import { SizePipe } from './pipes/size.pipe';
-import { ImagePipe } from './pipes/image.pipe';
-import { ContainerPortPipe } from './pipes/container-port.pipe';
-import { StackNamePipe } from './pipes/stack-name.pipe';
-import { ServiceNamePipe } from './pipes/service-name.pipe';
+import {
+    TruncatePipe,
+    SizePipe,
+    ImagePipe,
+    ContainerPortPipe,
+    StackNamePipe,
+    ServiceNamePipe
+} from './pipes';
 
 import { ServiceResolver } from './resolvers/service.resolver';
 
@@ -40,7 +43,6 @@ import { ServiceResolver } from './resolvers/service.resolver';
     declarations: [
         AppComponent,
         DashboardComponent,
-        CollectionComponent,
         ClusterDetailComponent,
         ServiceListComponent,
         ServiceCreateComponent,
@@ -71,7 +73,7 @@ import { ServiceResolver } from './resolvers/service.resolver';
         ApiService,
         StackService,
         ServiceService,
-        NodeService,
+        DockerService,
         EventService,
         ServiceResolver
     ],

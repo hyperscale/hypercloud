@@ -105,13 +105,13 @@ export interface Info {
 }
 
 export interface Service {
-    ID: string;
-    Version: Version;
-    CreatedAt: string;
-    UpdatedAt: string;
+    ID?: string;
+    Version?: Version;
+    CreatedAt?: string;
+    UpdatedAt?: string;
     Spec: ServiceSpec;
-    PreviousSpec: ServiceSpec;
-    Endpoint: Endpoint;
+    PreviousSpec?: ServiceSpec;
+    Endpoint?: Endpoint;
     UpdateStatus?: UpdateStatus;
 }
 
@@ -125,10 +125,10 @@ export interface UpdateStatus {
 export interface ServiceSpec {
     Name: string;
     Labels: Labels;
-    TaskTemplate: TaskSpec;
-    Mode: Mode;
-    UpdateConfig: UpdateConfig;
-    EndpointSpec: EndpointSpecOrSpec;
+    TaskTemplate?: TaskSpec;
+    Mode?: Mode;
+    UpdateConfig?: UpdateConfig;
+    EndpointSpec?: EndpointSpecOrSpec;
 }
 
 export interface TaskSpec {
@@ -449,8 +449,8 @@ export interface Message {
 }
 
 export interface Stack {
-    Name: string;
-    Services: number;
+    Name?: string;
+    Services?: number;
 }
 
 export interface VersionResponse {

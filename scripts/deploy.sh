@@ -3,7 +3,7 @@
 set -e
 
 usage() {
-    echo "Usage: $1 TAG_NAME"
+    echo "Usage: $0 TAG_NAME"
     exit 1
 }
 

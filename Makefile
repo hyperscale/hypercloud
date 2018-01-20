@@ -101,6 +101,14 @@ build-hyperpaas-server: $(shell find . -type f -print | grep -v vendor | grep "\
 run-hyperpaas-server: build-hyperpaas-server
 	./hyperpaas-server
 
+build-hyperpaas-starter: $(shell find . -type f -print | grep -v vendor | grep "\.go")
+	@echo "Building hyperpaas-starter..."
+	@go generate ./cmd/hyperpaas-starter/
+	@CGO_ENABLED=0 go build ./cmd/hyperpaas-starter/
+
+run-hyperpaas-starter: build-hyperpaas-starter
+	./hyperpaas-starter
+
 build-hyperpaas-installer: $(shell find . -type f -print | grep -v vendor | grep "\.go")
 	@echo "Building hyperpaas-installer..."
 	@go generate ./cmd/hyperpaas-installer/

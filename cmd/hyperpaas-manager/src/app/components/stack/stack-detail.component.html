@@ -1,9 +1,9 @@
 <h2>Stack {{ stack }}</h2>
 
-<a class="btn btn-sm btn-outline" routerLink="/service/create" [queryParams]="{stack_id: stack.id}">Create new service</a>
+<a class="btn btn-sm btn-outline" routerLink="/service/create" [queryParams]="{stack_id: stack}">Create new service</a>
 
 <table class="table">
-    <thead>
+    <thead *ngIf="services.length > 0">
         <tr>
             <th class="left">Name</th>
             <th class="left">Created At</th>
@@ -13,6 +13,12 @@
         <tr *ngFor="let service of services">
             <td class="left"><a [routerLink]="['/service/', service.ID]">{{ service | serviceName }}</a></td>
             <td class="left">{{ service.CreatedAt | date }}</td>
+        </tr>
+        <tr *ngIf="services.length === 0">
+            <td colspan="2">
+                <h3>This stack contains no service !</h3>
+                <a class="btn btn-sm btn-outline" routerLink="/service/create" [queryParams]="{stack_id: stack}">Create new service</a>
+            </td>
         </tr>
     </tbody>
 </table>

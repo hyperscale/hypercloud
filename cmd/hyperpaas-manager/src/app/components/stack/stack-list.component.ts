@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Stack } from '../../entities/docker';
-import { StackService } from '../../services/stack.service';
+import { Stack } from '../../entities';
+import { StackService } from '../../services';
 
 @Component({
     selector: 'app-stack-list',

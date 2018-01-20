@@ -7,14 +7,11 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
-	"time"
 
 	"github.com/asdine/storm"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/euskadi31/go-server"
-	std "github.com/euskadi31/go-std"
-	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/hyperscale/hyperpaas/database/entity"
 	"github.com/hyperscale/hyperpaas/docker"
@@ -61,7 +58,7 @@ func (c StackController) Mount(r *server.Router) {
 func (c StackController) getStacksHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	stackMap := map[string]*docker.Stack{}
+	stackMap := map[string]docker.Stack{}
 
 	{
 		var stacks []*entity.Stack
@@ -75,7 +72,7 @@ func (c StackController) getStacksHandler(w http.ResponseWriter, r *http.Request
 		}
 
 		for _, stack := range stacks {
-			stackMap[stack.Name] = &docker.Stack{
+			stackMap[stack.Name] = docker.Stack{
 				Name:     stack.Name,
 				Services: 0,
 			}
@@ -93,11 +90,11 @@ func (c StackController) getStacksHandler(w http.ResponseWriter, r *http.Request
 		}
 
 		for _, stack := range stacks {
-			stackMap[stack.Name] = &stack
+			stackMap[stack.Name] = stack
 		}
 	}
 
-	response := []*docker.Stack{}
+	response := []docker.Stack{}
 
 	for _, stack := range stackMap {
 		response = append(response, stack)
@@ -116,18 +113,7 @@ func (c StackController) getStacksHandler(w http.ResponseWriter, r *http.Request
 func (c StackController) postStacksHandler(w http.ResponseWriter, r *http.Request) {
 	// ctx := r.Context()
 
-	id, err := uuid.NewRandom()
-	if err != nil {
-		log.Error().Err(err).Msg("uuid.NewRandom")
-
-		server.FailureFromError(w, http.StatusInternalServerError, err)
-
-		return
-	}
-
-	stack := &entity.Stack{
-		ID: id.String(),
-	}
+	stack := &entity.Stack{}
 
 	if err := json.NewDecoder(r.Body).Decode(stack); err != nil {
 		log.Error().Err(err).Msg("Decode body request")
@@ -144,8 +130,6 @@ func (c StackController) postStacksHandler(w http.ResponseWriter, r *http.Reques
 
 		return
 	}
-
-	stack.CreatedAt = std.DateTimeFrom(time.Now().UTC())
 
 	if err := c.db.Save(stack); err != nil {
 		log.Error().Err(err).Msg("Save Stack")

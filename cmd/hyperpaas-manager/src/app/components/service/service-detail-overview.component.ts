@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Service } from '../../entities/docker';
+import { Service } from '../../entities';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({

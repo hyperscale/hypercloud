@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Service } from '../../entities/docker';
+import { Service } from '../../entities';
 
 @Component({
     selector: 'app-service-detail-settings',

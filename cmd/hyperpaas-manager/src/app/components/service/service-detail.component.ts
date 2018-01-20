@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
-import { Stack } from '../../entities/stack';
-import { Service } from '../../entities/docker';
-import { StackService } from '../../services/stack.service';
-import { ServiceService } from '../../services/service.service';
+import { Service, Stack } from '../../entities';
+import { StackService, ServiceService } from '../../services';
 
 @Component({
     selector: 'app-service-detail',
@@ -26,7 +24,7 @@ export class ServiceDetailComponent implements OnInit {
 
             this.fetchService(params['id']).then(service => {
                 this.stack = {
-                    name: service.Spec.Labels['com.docker.stack.namespace'],
+                    Name: service.Spec.Labels['com.docker.stack.namespace'],
                 };
             });
         });

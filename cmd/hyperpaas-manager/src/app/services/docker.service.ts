@@ -3,7 +3,7 @@ import { Node, Swarm, Info, VersionResponse, Task } from '../entities/docker';
 import { ApiService } from './api.service';
 
 @Injectable()
-export class NodeService {
+export class DockerService {
     constructor(private apiService: ApiService) { }
 
     public getVersion(): Promise<VersionResponse> {

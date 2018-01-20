@@ -6,9 +6,11 @@ var/
 hyperpaas
 hyperpaas-installer
 hyperpaas-server
+hyperpaas-starter
 _v1/
 node_modules
 cmd/hyperpaas-manager/node_modules
 !cmd/hyperpaas-installer
 !cmd/hyperpaas-server
+!cmd/hyperpaas-starter
 dev/

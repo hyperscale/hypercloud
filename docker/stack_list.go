@@ -52,6 +52,8 @@ func (c *Client) StackList(ctx context.Context) ([]Stack, error) {
 			}
 		} else {
 			ztack.Services++
+
+			m[name] = ztack
 		}
 	}
 

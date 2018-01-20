@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Service, StatsJSON, NetworkStats } from '../../entities/docker';
-import { ServiceService } from '../../services/service.service';
+import { Service, StatsJSON, NetworkStats } from '../../entities';
+import { ServiceService } from '../../services';
 import { Subscription } from 'rxjs/Subscription';
 import { Subject } from 'rxjs/Subject';
 import * as _ from 'lodash';
