@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, OnChanges, EventEmitter, Input, Output, SimpleChanges} from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { Router, ActivatedRoute, Params } from '@angular/router';
 import { Stack, ServiceRequest } from '../../entities';
 import { StackService, ServiceService } from '../../services';
 
@@ -14,18 +15,25 @@ export class ServiceCreateComponent implements OnInit, OnDestroy {
         name: ''
     };
     public stacks: Stack[] = [];
-    public stack = '';
 
     public submitted = false;
 
     constructor(
         private stackService: StackService,
-        private serviceService: ServiceService
+        private serviceService: ServiceService,
+        private router: Router,
+        private activatedRoute: ActivatedRoute
     ) {
     }
 
     ngOnInit(): void {
-        this.stackService.getStacks().then(stacks => this.stacks = stacks);
+        this.activatedRoute.queryParams.subscribe((params: Params) => {
+            console.log('StackID:', params['stack_id']);
+
+            this.service.stack_id = params['stack_id'] || '';
+
+            this.stackService.getStacks().then(stacks => this.stacks = stacks);
+        });
     }
 
     ngOnDestroy(): void {
@@ -49,11 +57,8 @@ export class ServiceCreateComponent implements OnInit, OnDestroy {
             console.log('Service Response', service);
 
             this.onReset();
-            // @todo: redirect
-        });
-    }
 
-    get diagnostic() {
-        return JSON.stringify(this.service, null, '  ');
+            this.router.navigate(['/service/', service.ID]);
+        });
     }
 }

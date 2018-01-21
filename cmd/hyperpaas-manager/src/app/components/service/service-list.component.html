@@ -2,21 +2,4 @@
 
 <a class="btn btn-sm btn-outline" routerLink="/service/create">Create new service</a>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th class="left">Name</th>
-            <th class="left">Mode</th>
-            <th class="left">Replicas</th>
-            <th class="left">Created At</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr *ngFor="let service of services">
-            <td class="left"><a [routerLink]="['/service/', service.ID]">{{ service | serviceName }}</a></td>
-            <td class="left">{{ serviceInfo[service.ID]?.Mode }}</td>
-            <td class="left">{{ serviceInfo[service.ID]?.Replicas.Running }}/{{ serviceInfo[service.ID]?.Replicas.Desired }}</td>
-            <td class="left">{{ service.CreatedAt | date }}</td>
-        </tr>
-    </tbody>
-</table>
+<app-service-list-table [services]="services"></app-service-list-table>

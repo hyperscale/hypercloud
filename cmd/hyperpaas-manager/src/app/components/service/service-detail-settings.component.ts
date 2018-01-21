@@ -25,16 +25,20 @@ export class ServiceDetailSettingsComponent implements OnInit {
     private processService() {
         const rule = this.service.Spec.Labels['traefik.frontend.rule'];
 
-        this.hosts = rule.substring(5).split(',');
+        if (rule) {
+            this.hosts = rule.substring(5).split(',');
+        }
 
-        this.envs = this.service.Spec.TaskTemplate.ContainerSpec.Env.map(item => {
-            const parts = item.split('=');
+        if (this.service.Spec.TaskTemplate.ContainerSpec.Env) {
+            this.envs = this.service.Spec.TaskTemplate.ContainerSpec.Env.map(item => {
+                const parts = item.split('=');
 
-            return {
-                key: parts[0],
-                value: parts[1],
-            };
-        });
+                return {
+                    key: parts[0],
+                    value: parts[1],
+                };
+            });
+        }
     }
 
 /*

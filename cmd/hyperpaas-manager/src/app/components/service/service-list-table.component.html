@@ -1,0 +1,29 @@
+<table class="table">
+    <thead>
+        <tr>
+            <th class="left">Name</th>
+            <th class="left">Mode</th>
+            <th class="left">Replicas</th>
+            <th class="left">Stack</th>
+            <th class="left">Created At</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let service of services">
+            <td class="left"><a [routerLink]="['/service/', service.ID]">{{ service | serviceName }}</a></td>
+            <td class="left">{{ serviceInfo[service.ID]?.Mode }}</td>
+            <td class="left">{{ serviceInfo[service.ID]?.Replicas.Running }}/{{ serviceInfo[service.ID]?.Replicas.Desired }}</td>
+            <td class="left"><a [routerLink]="['/stack/', service | stackName]">{{ service | stackName }}</a></td>
+            <td class="left">{{ service.CreatedAt | date }}</td>
+        </tr>
+        <tr *ngIf="services.length === 0">
+            <td colspan="5">
+                <h3>
+                    <ng-container *ngIf="stack">This stack contains no service !</ng-container>
+                    <ng-container *ngIf="!stack">The view contains no service !</ng-container>
+                </h3>
+                <a class="btn btn-sm btn-outline" routerLink="/service/create" [queryParams]="{stack_id: stack}">Create new service</a>
+            </td>
+        </tr>
+    </tbody>
+</table>

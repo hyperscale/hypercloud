@@ -120,7 +120,19 @@ func (c ServiceController) getServicesHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	server.JSON(w, http.StatusOK, services)
+	response := []swarm.Service{}
+
+	for _, service := range services {
+		labels := service.Spec.Labels
+
+		if _, ok := labels[docker.LabelInternalNamespace]; ok {
+			continue
+		}
+
+		response = append(response, service)
+	}
+
+	server.JSON(w, http.StatusOK, response)
 }
 
 // swagger:route POST /v1/services Service postServiceHandler

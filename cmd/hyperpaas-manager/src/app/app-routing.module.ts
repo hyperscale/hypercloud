@@ -10,6 +10,7 @@ import { ServiceDetailComponent } from './components/service/service-detail.comp
 import { ServiceDetailOverviewComponent } from './components/service/service-detail-overview.component';
 import { ServiceDetailMetricsComponent } from './components/service/service-detail-metrics.component';
 import { ServiceDetailSettingsComponent } from './components/service/service-detail-settings.component';
+import { ServiceDetailDeployComponent } from './components/service/service-detail-deploy.component';
 import { StackListComponent } from './components/stack/stack-list.component';
 import { StackDetailComponent } from './components/stack/stack-detail.component';
 
@@ -31,6 +32,7 @@ const routes: Routes = [
         children: [
             { path: '', redirectTo: 'overview', pathMatch: 'full' },
             { path: 'overview', component: ServiceDetailOverviewComponent },
+            { path: 'deploy', component: ServiceDetailDeployComponent },
             { path: 'metrics', component: ServiceDetailMetricsComponent },
             { path: 'settings', component: ServiceDetailSettingsComponent },
         ]

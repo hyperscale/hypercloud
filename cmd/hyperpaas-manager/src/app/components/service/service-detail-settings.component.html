@@ -51,19 +51,25 @@
 <section class="section-info">
     <div class="row">
         <div class="col-sm-4">
-            <h4>Info</h4>
+            <h4>Placements</h4>
         </div>
         <div class="col-sm-7 offset-sm-1">
-                <table class="table table-vertical">
+            <table class="table table-vertical" *ngIf="service?.Spec.TaskTemplate?.Placement">
                 <tbody>
-                    <tr>
-                        <th class="left">Architecture</th>
-                        <td class="left">{{ service?.Spec.TaskTemplate.Placement.Platforms[0].Architecture }}</td>
+                    <tr *ngIf="service?.Spec.TaskTemplate?.Placement?.Platforms">
+                        <th class="left">OS / Architectures</th>
+                        <td class="left">
+                            <span class="label" *ngFor="let item of service?.Spec.TaskTemplate.Placement?.Platforms">{{ item.OS }} / {{ item.Architecture }}</span>
+                        </td>
                     </tr>
-                    <tr>
-                        <th class="left">OS</th>
-                        <td class="left">{{ service?.Spec.TaskTemplate.Placement.Platforms[0].OS }}</td>
+
+                    <tr *ngIf="service?.Spec.TaskTemplate?.Placement?.Constraints">
+                        <th class="left">Constraints</th>
+                        <td class="left">
+                            <span class="label" *ngFor="let item of service?.Spec.TaskTemplate.Placement?.Constraints">{{ item }}</span>
+                        </td>
                     </tr>
+
                 </tbody>
             </table>
         </div>

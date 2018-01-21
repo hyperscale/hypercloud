@@ -16,6 +16,8 @@ import { ServiceDetailComponent } from './components/service/service-detail.comp
 import { ServiceDetailOverviewComponent } from './components/service/service-detail-overview.component';
 import { ServiceDetailMetricsComponent } from './components/service/service-detail-metrics.component';
 import { ServiceDetailSettingsComponent } from './components/service/service-detail-settings.component';
+import { ServiceDetailDeployComponent } from './components/service/service-detail-deploy.component';
+import { ServiceListTableComponent } from './components/service/service-list-table.component';
 import { ApplicationNameValidatorDirective } from './directives/application-name-validator.directive';
 import { StackListComponent } from './components/stack/stack-list.component';
 import { StackDetailComponent } from './components/stack/stack-detail.component';
@@ -48,8 +50,10 @@ import { ServiceResolver } from './resolvers/service.resolver';
         ServiceCreateComponent,
         ServiceDetailComponent,
         ServiceDetailOverviewComponent,
+        ServiceDetailDeployComponent,
         ServiceDetailMetricsComponent,
         ServiceDetailSettingsComponent,
+        ServiceListTableComponent,
         ApplicationNameValidatorDirective,
         StackListComponent,
         StackDetailComponent,

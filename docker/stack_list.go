@@ -15,7 +15,8 @@ import (
 
 const (
 	// LabelStackNamespace is the label used to track stack resources
-	LabelStackNamespace = "com.docker.stack.namespace"
+	LabelStackNamespace    = "com.docker.stack.namespace"
+	LabelInternalNamespace = "com.hyperpaas.internal"
 )
 
 type byName []Stack
@@ -42,6 +43,11 @@ func (c *Client) StackList(ctx context.Context) ([]Stack, error) {
 		name, ok := labels[LabelStackNamespace]
 		if !ok {
 			return nil, errors.Errorf("cannot get label %s for service %s", LabelStackNamespace, service.ID)
+		}
+
+		// skip internal service
+		if _, ok := labels[LabelInternalNamespace]; ok {
+			continue
 		}
 
 		ztack, ok := m[name]

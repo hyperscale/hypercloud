@@ -116,3 +116,9 @@ build-hyperpaas-installer: $(shell find . -type f -print | grep -v vendor | grep
 
 run-hyperpaas-installer: build-hyperpaas-installer
 	./hyperpaas-installer
+
+stack-deploy-dev:
+	@docker stack deploy -c dev/docker-compose.yml acme
+
+stack-deploy-installer:
+	@docker stack deploy -c cmd/hyperpaas-installer/docker-compose.yml hyperpaas

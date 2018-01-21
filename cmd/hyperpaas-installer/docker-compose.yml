@@ -6,7 +6,7 @@ services:
         source: /var/run/docker.sock
         target: /var/run/docker.sock
       - type: bind
-        source: /opt/traefik/
+        source: /Users/euskadi31/Projects/go-project/src/github.com/hyperscale/hyperpaas/var/lib/hyperpaas/traefik/
         target: /data
     ports:
       - 80:80
@@ -15,9 +15,9 @@ services:
     image: traefik:1.4.6
     command: [
       "traefik",
-      "--defaultentrypoints", "http,https",
-      "--entryPoints", "Name:http Address::80 Redirect.EntryPoint:https",
-      "--entryPoints", "Name:https Address::443 TLS",
+      "--defaultentrypoints=http,https",
+      "--entryPoints=Name:http Address::80 Redirect.EntryPoint:https",
+      "--entryPoints=Name:https Address::443 TLS",
       "--acme",
       "--acme.entrypoint=https",
       "--acme.email=axel@etcheverry.biz",
@@ -34,6 +34,9 @@ services:
     networks:
       - hyperpaas
     deploy:
+      mode: global
+      labels:
+        com.hyperpaas.internal: 'true'
       resources:
         limits:
           memory: 100M
