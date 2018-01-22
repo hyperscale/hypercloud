@@ -80,6 +80,7 @@ func (c ServiceController) Mount(r *server.Router) {
 	r.AddRouteFunc("/v1/services", c.getServicesHandler).Methods(http.MethodGet)
 	r.AddRouteFunc("/v1/services", c.postServiceHandler).Methods(http.MethodPost)
 	r.AddRouteFunc("/v1/services/{id:[0-9a-z]{25}}", c.getServiceHandler).Methods(http.MethodGet)
+	r.AddRouteFunc("/v1/services/{id:[0-9a-z]{25}}", c.putServiceHandler).Methods(http.MethodPut)
 	r.AddRoute("/v1/services/{id:[0-9a-z]{25}}/stats", events).Methods(http.MethodGet)
 }
 
@@ -371,4 +372,46 @@ func (c ServiceController) getServiceStatsHandler(rw sse.ResponseWriter, r *http
 			return
 		}
 	}
+}
+
+// swagger:route POST /v1/services/{id} Service putServiceHandler
+//
+// Update service
+//     Request: Service
+//     Responses:
+//       200: Service
+//
+func (c ServiceController) putServiceHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	params := mux.Vars(r)
+
+	id := params["id"]
+
+	log.Debug().Msgf("Service ID: %s", id)
+
+	var service swarm.Service
+
+	if err := json.NewDecoder(r.Body).Decode(&service); err != nil {
+		log.Error().Err(err).Msg("Unmarshal Request Body")
+
+		server.FailureFromError(w, http.StatusBadRequest, err)
+
+		return
+	}
+
+	resp, err := c.dockerClient.ServiceUpdate(ctx, id, service.Version, service.Spec, types.ServiceUpdateOptions{})
+	if err != nil {
+		log.Error().Err(err).Msg("Docker Service Update")
+
+		server.FailureFromError(w, http.StatusInternalServerError, err)
+
+		return
+	}
+
+	for _, w := range resp.Warnings {
+		log.Warn().Msg(w)
+	}
+
+	server.JSON(w, http.StatusOK, service)
 }

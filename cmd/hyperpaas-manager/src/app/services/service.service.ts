@@ -48,6 +48,11 @@ export class ServiceService {
             .then(response => response.json() as Service);
     }
 
+    public update(id: string, service: Service): Promise<Service> {
+        return this.apiService.put(`/v1/services/${id}`, service)
+            .then(response => response.json() as Service);
+    }
+
     public stats(id: string): Observable<StatsJSON> {
         return new Observable<StatsJSON>(obs => {
             const eventSource = new this.eventSource(this.apiService.getUrl(`/v1/services/${id}/stats`));

@@ -108,6 +108,18 @@
             "$ref": "#/responses/Service"
           }
         }
+      },
+      "post": {
+        "description": "Update service\nRequest: Service",
+        "tags": [
+          "Service"
+        ],
+        "operationId": "putServiceHandler",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/Service"
+          }
+        }
       }
     },
     "/v1/services/{id}/stats": {

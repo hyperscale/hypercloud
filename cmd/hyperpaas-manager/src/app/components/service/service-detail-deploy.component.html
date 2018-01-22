@@ -7,10 +7,10 @@
 
             <div class="row">
                 <div class="col-xs-3">
-                    <a href="#" class="card clickable">
+                    <button (click)="deploy_method = 'github'" class="card clickable" [ngClass]="{'active': deploy_method == 'github'}">
                         <div class="card-block">
                             <div class="card-media-block">
-                                <img src="https://unpkg.com/simple-icons@1.2.19/icons/github.svg" class="card-media-image" alt="" />
+                                <img src="/assets/icons/github.svg" class="card-media-image" alt="" />
                                 <div class="card-media-description">
                                     <span class="card-media-title">
                                         Github
@@ -21,14 +21,13 @@
                                 </div>
                             </div>
                         </div>
-                    </a>
+                    </button>
                 </div>
                 <div class="col-xs-3">
-                    <a href="#" class="card clickable">
+                    <button (click)="deploy_method = 'bitbucket'" class="card clickable" [ngClass]="{'active': deploy_method == 'bitbucket'}">
                         <div class="card-block">
                             <div class="card-media-block">
-                                <!-- img src="https://bitbucket-marketing-cdn.atlassian.com/dam/jcr:6bb63fa2-de51-41f3-aaa5-3e324ee9c74b/Bitbucket-icon-blue.svg?cdnVersion=jh" class="card-media-image" /-->
-                                <img  src="https://unpkg.com/simple-icons@1.2.19/icons/bitbucket.svg" class="card-media-image" alt="" />
+                                <img  src="/assets/icons/bitbucket.svg" class="card-media-image" alt="" />
                                 <div class="card-media-description">
                                     <span class="card-media-title">
                                         Bitbucket
@@ -39,13 +38,13 @@
                                 </div>
                             </div>
                         </div>
-                    </a>
+                    </button>
                 </div>
                 <div class="col-xs-3">
-                    <a href="#" class="card clickable">
+                    <button (click)="deploy_method = 'docker'" class="card clickable" [ngClass]="{'active': deploy_method == 'docker'}">
                         <div class="card-block">
                             <div class="card-media-block">
-                                <img src="https://unpkg.com/simple-icons@1.2.19/icons/docker.svg" class="card-media-image" alt="" />
+                                <img src="/assets/icons/docker_mono.svg" class="card-media-image" alt="" />
                                 <div class="card-media-description">
                                     <span class="card-media-title">
                                         Docker
@@ -56,13 +55,13 @@
                                 </div>
                             </div>
                         </div>
-                    </a>
+                    </button>
                 </div>
                 <div class="col-xs-3">
-                    <a href="#" class="card clickable">
+                    <button (click)="deploy_method = 'git'" class="card clickable" [ngClass]="{'active': deploy_method == 'git'}">
                         <div class="card-block">
                             <div class="card-media-block">
-                                <img src="https://unpkg.com/simple-icons@1.2.19/icons/git.svg" class="card-media-image" alt="" />
+                                <img src="/assets/icons/git.svg" class="card-media-image" alt="" />
                                 <div class="card-media-description">
                                     <span class="card-media-title">
                                         Git
@@ -73,9 +72,42 @@
                                 </div>
                             </div>
                         </div>
-                    </a>
+                    </button>
                 </div>
             </div>
+
+        </div>
+    </div>
+</section>
+
+<section class="section-info" *ngIf="deploy_method != undefined">
+    <div class="row" *ngIf="deploy_method == 'docker'">
+        <div class="col-sm-2">
+            <h4>Deploy docker image</h4>
+        </div>
+        <div class="col-sm-9 offset-sm-1">
+
+            <form #dockerForm="ngForm" (ngSubmit)="onDeployDockerSubmit()">
+                <section class="form-block">
+                    <div class="form-group">
+                        <label for="dockerImageRef">Docker Image</label>
+                        <label for="dockerImageRef" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md" [class.invalid]="dockerImageRefInput.invalid && (dockerImageRefInput.dirty || dockerImageRefInput.touched)">
+                            <input id="dockerImageRef" placeholder="vendor/image:tag" type="text"
+                                size="34"
+                                pattern="^([a-z0-9\.\-]+(\:\d+)?\/)?([a-z0-9]{4,30}(\/)?)([a-z0-9]+)(\:[a-z0-9\.\-]+)?$"
+                                required
+                                name="dockerImageRef"
+                                [(ngModel)]="docker.image"
+                                #dockerImageRefInput="ngModel" />
+                            <span class="tooltip-content">
+                                <ng-container *ngIf="dockerImageRefInput.errors?.required">Docker Image is Required.</ng-container>
+                                <ng-container *ngIf="dockerImageRefInput.errors?.pattern">This is not valid Docker Image Reference.</ng-container>
+                            </span>
+                        </label>
+                    </div>
+                </section>
+                <button type="submit" class="btn btn-primary" [disabled]="!dockerForm.form.valid">Save</button>
+            </form>
 
         </div>
     </div>
