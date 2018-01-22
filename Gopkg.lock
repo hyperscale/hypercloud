@@ -187,12 +187,6 @@
   revision = "1e59b77b52bf8e4b449a57e6f79f21226d571845"
 
 [[projects]]
-  name = "github.com/google/uuid"
-  packages = ["."]
-  revision = "064e2069ce9c359c118179501254f67d7d37ba24"
-  version = "0.2"
-
-[[projects]]
   name = "github.com/gorilla/context"
   packages = ["."]
   revision = "1ea25387ff6f684839d82767c1733ff4d4d15d0a"
@@ -364,7 +358,7 @@
   branch = "master"
   name = "github.com/xeipuuv/gojsonpointer"
   packages = ["."]
-  revision = "6fe8760cad3569743d51ddbb243b26f8456742dc"
+  revision = "e0fe6f68307607d540ed8eac07a342c33fa1b54a"
 
 [[projects]]
   branch = "master"
@@ -376,7 +370,7 @@
   branch = "master"
   name = "github.com/xeipuuv/gojsonschema"
   packages = ["."]
-  revision = "511d08a359d14c0dd9c4302af52ee9abb6f93c2a"
+  revision = "93e72a773fade158921402d6a24c819b48aba29d"
 
 [[projects]]
   name = "github.com/zenazn/goji"
@@ -423,6 +417,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b61007bef557290e7a9fc4c988f5de4c6e4fce237e9a524219306fe83c0601d3"
+  inputs-digest = "e64497b77a770095c6f5ab246ed6696454d6ad16c84435ef50e3240f8f929643"
   solver-name = "gps-cdcl"
   solver-version = 1
