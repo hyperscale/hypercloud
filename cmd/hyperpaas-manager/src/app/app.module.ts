@@ -17,10 +17,12 @@ import { ServiceDetailOverviewComponent } from './components/service/service-det
 import { ServiceDetailMetricsComponent } from './components/service/service-detail-metrics.component';
 import { ServiceDetailSettingsComponent } from './components/service/service-detail-settings.component';
 import { ServiceDetailDeployComponent } from './components/service/service-detail-deploy.component';
+import { ServiceDetailScalabilityComponent } from './components/service/service-detail-scalability.component';
 import { ServiceListTableComponent } from './components/service/service-list-table.component';
 import { ApplicationNameValidatorDirective } from './directives/application-name-validator.directive';
 import { StackListComponent } from './components/stack/stack-list.component';
 import { StackDetailComponent } from './components/stack/stack-detail.component';
+import { DockerStateComponent } from './components/shared/docker-state/docker-state.component';
 
 import {
     ApiService,
@@ -51,12 +53,14 @@ import { ServiceResolver } from './resolvers/service.resolver';
         ServiceDetailComponent,
         ServiceDetailOverviewComponent,
         ServiceDetailDeployComponent,
+        ServiceDetailScalabilityComponent,
         ServiceDetailMetricsComponent,
         ServiceDetailSettingsComponent,
         ServiceListTableComponent,
         ApplicationNameValidatorDirective,
         StackListComponent,
         StackDetailComponent,
+        DockerStateComponent,
         TruncatePipe,
         SizePipe,
         ImagePipe,

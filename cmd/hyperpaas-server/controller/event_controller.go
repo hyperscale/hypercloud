@@ -66,9 +66,8 @@ func (c EventController) getEventsHandler(rw sse.ResponseWriter, r *http.Request
 			}
 
 			rw.Send(&sse.MessageEvent{
-				ID:    strconv.FormatInt(event.TimeNano, 10),
-				Event: event.Type,
-				Data:  data,
+				ID:   strconv.FormatInt(event.TimeNano, 10),
+				Data: data,
 			})
 		case err := <-errCh:
 			log.Error().Err(err).Msg("Events")

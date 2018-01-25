@@ -48,8 +48,7 @@
             <td class="left">{{ node.Status.Addr }}</td>
             <td class="left">{{ node.Spec.Availability }}</td>
             <td class="left">
-                <span class="label label-success" *ngIf="node.Status.State == 'ready'">{{ node.Status.State }}</span>
-                <span class="label label-danger" *ngIf="node.Status.State != 'ready'">{{ node.Status.State }}</span>
+                <app-docker-state [state]="node.Status.State" [type]="'node'"></app-docker-state>
             </td>
         </tr>
     </tbody>

@@ -11,6 +11,7 @@ import { ServiceDetailOverviewComponent } from './components/service/service-det
 import { ServiceDetailMetricsComponent } from './components/service/service-detail-metrics.component';
 import { ServiceDetailSettingsComponent } from './components/service/service-detail-settings.component';
 import { ServiceDetailDeployComponent } from './components/service/service-detail-deploy.component';
+import { ServiceDetailScalabilityComponent } from './components/service/service-detail-scalability.component';
 import { StackListComponent } from './components/stack/stack-list.component';
 import { StackDetailComponent } from './components/stack/stack-detail.component';
 
@@ -33,6 +34,7 @@ const routes: Routes = [
             { path: '', redirectTo: 'overview', pathMatch: 'full' },
             { path: 'overview', component: ServiceDetailOverviewComponent },
             { path: 'deploy', component: ServiceDetailDeployComponent },
+            { path: 'scalability', component: ServiceDetailScalabilityComponent },
             { path: 'metrics', component: ServiceDetailMetricsComponent },
             { path: 'settings', component: ServiceDetailSettingsComponent },
         ]

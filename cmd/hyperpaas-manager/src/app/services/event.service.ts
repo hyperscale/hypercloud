@@ -18,6 +18,8 @@ export class EventService {
     }
 
     public events(query?: EventsQueryParams): Observable<Message> {
+        console.log('EventService::events()');
+
         return new Observable<Message>(obs => {
             const params: URLSearchParams = new URLSearchParams();
 
@@ -35,7 +37,8 @@ export class EventService {
 
             const eventSource = new this.eventSource(this.apiService.getUrl(url));
 
-            eventSource.onmessage = event => {
+            eventSource.onmessage = (event) => {
+                console.log('Message:', event.data);
                 const data = JSON.parse(event.data) as Message;
 
                 this.ngZone.run(() => obs.next(data));
