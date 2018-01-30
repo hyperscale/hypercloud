@@ -31,7 +31,15 @@
 
 [[constraint]]
   name = "github.com/docker/cli"
-  branch = "master"
+  revision = "12c0825a4c1bdbfd03d704b5cc3434e8bc9ca0ed"
+
+[[constraint]]
+  name = "github.com/docker/swarmkit"
+  revision = "de950a7ed842c7b7e47e9451cde9bf8f96031894"
+
+[[constraint]]
+  name = "google.golang.org/grpc"
+  version = "v1.3.0"
 
 [[constraint]]
   name = "github.com/docker/distribution"
