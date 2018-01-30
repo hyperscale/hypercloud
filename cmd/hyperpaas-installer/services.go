@@ -6,27 +6,35 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	stdlog "log"
+	"net/http"
 	"os"
 	"strings"
 	"time"
 
-	"github.com/docker/docker/client"
+	"github.com/euskadi31/go-server"
 	"github.com/euskadi31/go-service"
+	"github.com/hyperscale/hyperpaas/cmd/hyperpaas-installer/controller"
 	"github.com/hyperscale/hyperpaas/config"
+	"github.com/hyperscale/hyperpaas/docker"
 	"github.com/hyperscale/hyperpaas/version"
+	"github.com/rs/cors"
 	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/hlog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 )
 
 // const of service name
 const (
-	ServiceLoggerKey string = "service.logger"
-	ServiceConfigKey        = "service.config"
-	ServiceRouterKey        = "service.router"
-	ServiceDockerKey        = "service.docker.client"
-	ServiceAppKey           = "service.app"
+	ServiceLoggerKey              string = "service.logger"
+	ServiceConfigKey                     = "service.config"
+	ServiceRouterKey                     = "service.router"
+	ServiceDockerKey                     = "service.docker.client"
+	ServiceAppKey                        = "service.app"
+	ServiceInstallerControllerKey        = "service.controller.installer"
+	ServiceUIControllerKey               = "service.controller.ui"
 )
 
 const applicationName = "hyperpaas-installer"
@@ -108,11 +116,107 @@ func init() {
 	})
 
 	container.Set(ServiceDockerKey, func(c *service.Container) interface{} {
-		dc, err := client.NewEnvClient()
+		dc, err := docker.NewEnvClient()
 		if err != nil {
 			log.Fatal().Err(err).Msg(ServiceDockerKey)
 		}
 
 		return dc
+	})
+
+	container.Set(ServiceUIControllerKey, func(c *service.Container) interface{} {
+		controller, err := controller.NewUIController()
+		if err != nil {
+			log.Fatal().Err(err).Msg(ServiceUIControllerKey)
+		}
+
+		return controller
+	})
+
+	container.Set(ServiceInstallerControllerKey, func(c *service.Container) interface{} {
+		dockerClient := c.Get(ServiceDockerKey).(*docker.Client)
+
+		controller, err := controller.NewInstallerController(dockerClient)
+		if err != nil {
+			log.Fatal().Err(err).Msg(ServiceInstallerControllerKey)
+		}
+
+		return controller
+	})
+
+	// Router Service
+	container.Set(ServiceRouterKey, func(c *service.Container) interface{} {
+		logger := c.Get(ServiceLoggerKey).(zerolog.Logger)
+		cfg := c.Get(ServiceConfigKey).(*config.Configuration)
+		dockerClient := c.Get(ServiceDockerKey).(*docker.Client)
+		installerController := c.Get(ServiceInstallerControllerKey).(server.Controller)
+		uiController := c.Get(ServiceUIControllerKey).(server.Controller)
+
+		router := server.NewRouter()
+
+		router.Use(hlog.NewHandler(logger))
+		router.Use(hlog.AccessHandler(func(r *http.Request, status, size int, duration time.Duration) {
+			rlog := hlog.FromRequest(r)
+
+			var evt *zerolog.Event
+
+			switch {
+			case status >= 200 && status <= 299:
+				evt = rlog.Info()
+			case status >= 300 && status <= 399:
+				evt = rlog.Info()
+			case status >= 400 && status <= 499:
+				evt = rlog.Warn()
+			default:
+				evt = rlog.Error()
+			}
+
+			evt.
+				Str("method", r.Method).
+				Str("url", r.URL.String()).
+				Int("status", status).
+				Int("size", size).
+				Dur("duration", duration).
+				Msgf("%s %s", r.Method, r.URL.Path)
+		}))
+		router.Use(hlog.RemoteAddrHandler("ip"))
+		router.Use(hlog.UserAgentHandler("user_agent"))
+		router.Use(hlog.RefererHandler("referer"))
+		router.Use(hlog.RequestIDHandler("req_id", "Request-Id"))
+
+		router.EnableHealthCheck()
+		router.EnableRecovery()
+		router.EnableCorsWithOptions(cors.Options{
+			AllowCredentials: true,
+			AllowedOrigins:   []string{"*"},
+			AllowedMethods: []string{
+				http.MethodGet,
+				http.MethodOptions,
+				http.MethodPost,
+				http.MethodPut,
+				http.MethodDelete,
+			},
+			AllowedHeaders: []string{
+				"Authorization",
+				"Content-Type",
+				"X-Requested-With",
+			},
+			Debug: cfg.Server.Debug,
+		})
+
+		router.SetNotFoundFunc(func(w http.ResponseWriter, r *http.Request) {
+			server.JSON(w, http.StatusNotFound, map[string]interface{}{
+				"error": map[string]interface{}{
+					"message": fmt.Sprintf("%s %s not found", r.Method, r.URL.Path),
+				},
+			})
+		})
+
+		router.AddHealthCheck("docker", docker.NewHealthCheck(dockerClient))
+
+		router.AddController(uiController)
+		router.AddController(installerController)
+
+		return router
 	})
 }
