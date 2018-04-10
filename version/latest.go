@@ -9,9 +9,10 @@ import (
 	"net/http"
 
 	"github.com/coreos/go-semver/semver"
+	"github.com/rs/zerolog/log"
 )
 
-const githubTagsAPI = "https://api.github.com/repos/hyperscale/hyperpaas/tags"
+var githubTagsAPI = "https://api.github.com/repos/hyperscale/hyperpaas/tags"
 
 type githubTag struct {
 	Name string `json:"name"`
@@ -37,8 +38,14 @@ func GetLatest() (version *semver.Version, err error) {
 	latest := Version
 
 	for _, tag := range tags {
+		if tag.Name[0] == 'v' {
+			tag.Name = tag.Name[1:]
+		}
+
 		tagVersion, err := semver.NewVersion(tag.Name)
 		if err != nil {
+			log.Error().Err(err).Msgf("Parsing version: %s", tag.Name)
+
 			continue
 		}
 
