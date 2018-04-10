@@ -4,8 +4,11 @@
 
 package config
 
-import "fmt"
-import "time"
+import (
+	"net"
+	"strconv"
+	"time"
+)
 
 // ServerConfiguration struct
 type ServerConfiguration struct {
@@ -20,5 +23,5 @@ type ServerConfiguration struct {
 
 // Addr string
 func (c ServerConfiguration) Addr() string {
-	return fmt.Sprintf("%s:%d", c.Host, c.Port)
+	return net.JoinHostPort(c.Host, strconv.Itoa(c.Port))
 }
