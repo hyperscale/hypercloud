@@ -108,6 +108,43 @@ services:
     networks:
       - hyperpaas
 
+  registry:
+    image: registry:2
+    volumes:
+      - registry-data:/var/lib/registry
+    environment:
+      - REGISTRY_AUTH="htpasswd"
+      - REGISTRY_AUTH_HTPASSWD_PATH="/run/secrets/index.$DOMAIN.htpasswd"
+      - REGISTRY_AUTH_HTPASSWD_REALM="Registry Realm"
+      - REGISTRY_STORAGE="filesystem"
+      - REGISTRY_LOG_LEVEL="debug"
+    deploy:
+      replicas: 1
+      labels:
+        com.hyperpaas.internal: 'true'
+        traefik.port: '5000'
+        traefik.frontend.entryPoints: 'https'
+        traefik.frontend.rule: 'Host:index.$DOMAIN'
+        traefik.enable: 'true'
+        traefik.docker.network: 'hyperpaas'
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 1
+        delay: 10s
+      resources:
+        limits:
+          memory: 100M
+        reservations:
+          memory: 50M
+    secrets:
+      - registry.htpasswd
+    networks:
+      - hyperpaas
+
 networks:
   hyperpaas:
     driver: overlay
@@ -120,3 +157,11 @@ volumes:
       driver: local
       labels:
         com.hyperpaas.internal: 'true'
+  registry-data:
+      driver: local
+      labels:
+        com.hyperpaas.internal: 'true'
+
+secrets:
+  registry.htpasswd:
+    external: true

@@ -33,12 +33,22 @@
                                     <form method="post" id="installer">
                                         <div class="form-group">
                                             <label for="domain">Domain of your PaaS</label>
-                                            <input type="text" id="domain" placeholder="domain.tld" size="45" name="domain" />
+                                            <input type="text" id="domain" placeholder="domain.tld" pattern="^[a-z0-9][a-z0-9\-\.]+" size="45" name="domain" />
                                         </div>
 
                                         <div class="form-group">
                                             <label for="email">Email for Let's Encrypt</label>
                                             <input type="email" id="email" placeholder="steve@domain.tld" size="45" name="email" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="registry-user">User for Registry</label>
+                                            <input type="text" id="registry-user" placeholder="steve" size="45" name="registry_user" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="registry-password">Password for Registry</label>
+                                            <input type="password" id="registry-password" size="45" name="registry_password" />
                                         </div>
                                     </form>
                                 </div>
@@ -73,14 +83,14 @@
 
                 console.log('event', event);
 
-                if (event.type === 'finished') {
+                if (event.type === 'install' && event.action === 'finished') {
                     $progress.style.display = 'none';
                     $installBtn.removeAttribute('disabled');
 
                     //@TODO redirect to manager url
                 }
 
-                if (event.type === 'errored') {
+                if (event.action === 'failed') {
                     $progress.style.display = 'none';
                     $installBtn.removeAttribute('disabled');
 

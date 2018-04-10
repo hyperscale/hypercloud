@@ -7,6 +7,7 @@ package controller
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"sort"
 	"time"
@@ -25,6 +26,7 @@ import (
 	"github.com/hyperscale/hyperpaas/docker/compose"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // Resolve image constants
@@ -37,7 +39,9 @@ const (
 
 // Event struct
 type Event struct {
-	Type string `json:"type"`
+	Type   string `json:"type"`
+	Action string `json:"action"`
+	Error  string `json:"error,omitempty"`
 }
 
 // InstallerController struct
@@ -76,7 +80,8 @@ func (c *InstallerController) postInstallerHandler(w http.ResponseWriter, r *htt
 	log.Info().Msgf("Data: %#v", r.PostForm)
 
 	c.events <- Event{
-		Type: "started",
+		Type:   "install",
+		Action: "started",
 	}
 
 	content, err := assets.Asset("static/config/docker-compose.yml")
@@ -86,6 +91,11 @@ func (c *InstallerController) postInstallerHandler(w http.ResponseWriter, r *htt
 		return
 	}
 
+	c.events <- Event{
+		Type:   "compose",
+		Action: "loading",
+	}
+
 	composeConfig, err := compose.Loader(content, map[string]string{
 		"EMAIL":  r.PostForm.Get("email"),
 		"DOMAIN": r.PostForm.Get("domain"),
@@ -93,23 +103,45 @@ func (c *InstallerController) postInstallerHandler(w http.ResponseWriter, r *htt
 	if err != nil {
 		server.FailureFromError(w, http.StatusInternalServerError, err)
 
+		c.events <- Event{
+			Type:   "compose",
+			Action: "failed",
+			Error:  err.Error(),
+		}
+
 		return
 	}
 
 	c.events <- Event{
-		Type: "configured",
+		Type:   "compose",
+		Action: "loaded",
 	}
 
 	go func() {
 		namespace := convert.NewNamespace("hyperpaas")
 
 		{
+			c.events <- Event{
+				Type:   "services",
+				Action: "cleaning",
+			}
+
 			// prune services
 			services := map[string]struct{}{}
 			for _, service := range composeConfig.Services {
 				services[service.Name] = struct{}{}
 			}
 			pruneServices(ctx, c.dockerClient, namespace, services)
+
+			c.events <- Event{
+				Type:   "services",
+				Action: "cleaned",
+			}
+		}
+
+		c.events <- Event{
+			Type:   "networks",
+			Action: "loading",
 		}
 
 		serviceNetworks := getServicesDeclaredNetworks(composeConfig.Services)
@@ -117,13 +149,45 @@ func (c *InstallerController) postInstallerHandler(w http.ResponseWriter, r *htt
 		if err := validateExternalNetworks(ctx, c.dockerClient, externalNetworks); err != nil {
 			log.Error().Err(err).Msg("validateExternalNetworks")
 
+			c.events <- Event{
+				Type:   "networks",
+				Action: "failed",
+				Error:  err.Error(),
+			}
+
 			return
+		}
+
+		c.events <- Event{
+			Type:   "networks",
+			Action: "loaded",
+		}
+
+		c.events <- Event{
+			Type:   "networks",
+			Action: "creating",
 		}
 
 		if err := createNetworks(ctx, c.dockerClient, namespace, networks); err != nil {
 			log.Error().Err(err).Msg("createNetworks")
 
+			c.events <- Event{
+				Type:   "networks",
+				Action: "failed",
+				Error:  err.Error(),
+			}
+
 			return
+		}
+
+		c.events <- Event{
+			Type:   "networks",
+			Action: "created",
+		}
+
+		c.events <- Event{
+			Type:   "secrets",
+			Action: "loading",
 		}
 
 		secrets, err := convert.Secrets(namespace, composeConfig.Secrets)
@@ -133,41 +197,150 @@ func (c *InstallerController) postInstallerHandler(w http.ResponseWriter, r *htt
 			return
 		}
 
+		c.events <- Event{
+			Type:   "secrets",
+			Action: "loaded",
+		}
+
+		c.events <- Event{
+			Type:   "secrets",
+			Action: "creating",
+		}
+
+		registryPwd, err := hashBcrypt(r.PostForm.Get("registry_password"))
+		if err != nil {
+			log.Error().Err(err).Msg("hashBcrypt")
+
+			c.events <- Event{
+				Type:   "secrets",
+				Action: "failed",
+				Error:  err.Error(),
+			}
+
+			return
+		}
+
+		secrets = append(secrets, swarm.SecretSpec{
+			Annotations: swarm.Annotations{
+				Name: "registry.htpasswd",
+				Labels: map[string]string{
+					"com.hyperpaas.internal": "true",
+				},
+			},
+			Data: []byte(fmt.Sprintf("%s:%s", r.PostForm.Get("registry_user"), registryPwd)),
+		})
+
 		if err := createSecrets(ctx, c.dockerClient, secrets); err != nil {
 			log.Error().Err(err).Msg("createSecrets")
 
+			c.events <- Event{
+				Type:   "secrets",
+				Action: "failed",
+				Error:  err.Error(),
+			}
+
 			return
+		}
+
+		c.events <- Event{
+			Type:   "secrets",
+			Action: "created",
+		}
+
+		c.events <- Event{
+			Type:   "configs",
+			Action: "loading",
 		}
 
 		configs, err := convert.Configs(namespace, composeConfig.Configs)
 		if err != nil {
 			log.Error().Err(err).Msg("Configs")
 
+			c.events <- Event{
+				Type:   "configs",
+				Action: "failed",
+				Error:  err.Error(),
+			}
+
 			return
+		}
+
+		c.events <- Event{
+			Type:   "confings",
+			Action: "loaded",
+		}
+
+		c.events <- Event{
+			Type:   "configs",
+			Action: "creating",
 		}
 
 		if err := createConfigs(ctx, c.dockerClient, configs); err != nil {
 			log.Error().Err(err).Msg("createConfigs")
 
+			c.events <- Event{
+				Type:   "configs",
+				Action: "failed",
+				Error:  err.Error(),
+			}
+
 			return
+		}
+
+		c.events <- Event{
+			Type:   "configs",
+			Action: "created",
+		}
+
+		c.events <- Event{
+			Type:   "services",
+			Action: "loading",
 		}
 
 		services, err := convert.Services(namespace, composeConfig, c.dockerClient.Client)
 		if err != nil {
 			log.Error().Err(err).Msg("Services")
 
+			c.events <- Event{
+				Type:   "services",
+				Action: "failed",
+				Error:  err.Error(),
+			}
+
 			return
+		}
+
+		c.events <- Event{
+			Type:   "services",
+			Action: "loaded",
+		}
+
+		c.events <- Event{
+			Type:   "services",
+			Action: "deploying",
 		}
 
 		if err := deployServices(ctx, c.dockerClient, services, namespace, true, ResolveImageAlways); err != nil {
 			log.Error().Err(err).Msg("deployServices")
+
+			c.events <- Event{
+				Type:   "services",
+				Action: "failed",
+				Error:  err.Error(),
+			}
 
 			//@TODO send Error Event
 			return
 		}
 
 		c.events <- Event{
-			Type: "finished",
+			Type:   "services",
+			Action: "deployed",
+		}
+
+		c.events <- Event{
+			Type:   "install",
+			Action: "finished",
 		}
 	}()
 
@@ -507,4 +680,13 @@ func getServiceFilter(namespace string) filters.Args {
 
 func getServices(ctx context.Context, client *docker.Client, namespace string) ([]swarm.Service, error) {
 	return client.ServiceList(ctx, types.ServiceListOptions{Filters: getServiceFilter(namespace)})
+}
+
+func hashBcrypt(password string) (hash string, err error) {
+	passwordBytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return
+	}
+
+	return string(passwordBytes), nil
 }
