@@ -33,7 +33,7 @@ before_script:
   - dep ensure
 
 script:
-  - make travis
+  - make cover
 
 after_success:
   - goveralls -service=travis-ci
