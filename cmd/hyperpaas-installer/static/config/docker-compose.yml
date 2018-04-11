@@ -164,4 +164,6 @@ volumes:
 
 secrets:
   registry.htpasswd:
-    external: true
+    labels:
+      com.hyperpaas.internal: 'true'
+    file: ./var/lib/hyperpaas/secrets/registry.htpasswd

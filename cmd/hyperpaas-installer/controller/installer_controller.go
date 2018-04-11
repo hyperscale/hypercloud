@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"sort"
 	"time"
 
@@ -185,6 +186,50 @@ func (c *InstallerController) postInstallerHandler(w http.ResponseWriter, r *htt
 			Action: "created",
 		}
 
+		registryPwd, err := hashBcrypt(r.PostForm.Get("registry_password"))
+		if err != nil {
+			log.Error().Err(err).Msg("hashBcrypt")
+
+			c.events <- Event{
+				Type:   "secrets",
+				Action: "failed",
+				Error:  err.Error(),
+			}
+
+			return
+		}
+
+		file, err := os.OpenFile("./var/lib/hyperpaas/secrets/registry.htpasswd", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+		if err != nil {
+			log.Error().Err(err).Msg("OpenFile")
+
+			c.events <- Event{
+				Type:   "secrets",
+				Action: "failed",
+				Error:  err.Error(),
+			}
+
+			return
+		}
+
+		defer func() {
+			if err := file.Close(); err != nil {
+				log.Error().Err(err).Msg("OpenFile Close")
+			}
+		}()
+
+		if _, err := file.Write([]byte(fmt.Sprintf("%s:%s", r.PostForm.Get("registry_user"), registryPwd))); err != nil {
+			log.Error().Err(err).Msg("OpenFile")
+
+			c.events <- Event{
+				Type:   "secrets",
+				Action: "failed",
+				Error:  err.Error(),
+			}
+
+			return
+		}
+
 		c.events <- Event{
 			Type:   "secrets",
 			Action: "loading",
@@ -206,29 +251,6 @@ func (c *InstallerController) postInstallerHandler(w http.ResponseWriter, r *htt
 			Type:   "secrets",
 			Action: "creating",
 		}
-
-		registryPwd, err := hashBcrypt(r.PostForm.Get("registry_password"))
-		if err != nil {
-			log.Error().Err(err).Msg("hashBcrypt")
-
-			c.events <- Event{
-				Type:   "secrets",
-				Action: "failed",
-				Error:  err.Error(),
-			}
-
-			return
-		}
-
-		secrets = append(secrets, swarm.SecretSpec{
-			Annotations: swarm.Annotations{
-				Name: "registry.htpasswd",
-				Labels: map[string]string{
-					"com.hyperpaas.internal": "true",
-				},
-			},
-			Data: []byte(fmt.Sprintf("%s:%s", r.PostForm.Get("registry_user"), registryPwd)),
-		})
 
 		if err := createSecrets(ctx, c.dockerClient, secrets); err != nil {
 			log.Error().Err(err).Msg("createSecrets")
@@ -493,6 +515,19 @@ func validateExternalNetworks(ctx context.Context, client dockerclient.NetworkAP
 			return err
 		case network.Scope != "swarm":
 			return errors.Errorf("network %q is declared as external, but it is not in the right scope: %q instead of \"swarm\"", networkName, network.Scope)
+		}
+	}
+
+	return nil
+}
+
+func deleteSecrets(ctx context.Context, client *docker.Client, secrets []swarm.SecretReference) error {
+	for _, secretRef := range secrets {
+		secret, _, err := client.SecretInspectWithRaw(ctx, secretRef.SecretName)
+		if err == nil {
+			if err := client.SecretRemove(ctx, secret.ID); err != nil {
+				return errors.Wrapf(err, "failed to remove secret %s", secretRef.SecretName)
+			}
 		}
 	}
 
