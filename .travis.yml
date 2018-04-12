@@ -36,7 +36,7 @@ script:
   - make cover
 
 after_success:
-  - goveralls -service=travis-ci
+  - goveralls -coverprofile=coverage.out -service=travis-ci
   - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
 
 deploy:
