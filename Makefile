@@ -1,13 +1,21 @@
-.PHONY: all clean deps fmt vet test docker
+BUILD_DIR ?= build
+COMMIT = $(shell git rev-parse HEAD)
+VERSION ?= $(shell git describe --always --tags --dirty)
+ORG := github.com/hyperscale
+PROJECT := hyperpaas
+REPOPATH ?= $(ORG)/$(PROJECT)
+VERSION_PACKAGE = $(REPOPATH)/pkg/hyperpaas/version
 
-EXECUTABLE ?= hyperpaas
-IMAGE ?= hyperscale/$(EXECUTABLE)
-VERSION ?= $(shell git describe --match 'v[0-9]*' --dirty='-dev' --always)
-COMMIT ?= $(shell git rev-parse --short HEAD)
+GO_LDFLAGS :="
+GO_LDFLAGS += -X $(VERSION_PACKAGE).version=$(VERSION)
+GO_LDFLAGS += -X $(VERSION_PACKAGE).buildDate=$(shell date +'%Y-%m-%dT%H:%M:%SZ')
+GO_LDFLAGS += -X $(VERSION_PACKAGE).gitCommit=$(COMMIT)
+GO_LDFLAGS += -X $(VERSION_PACKAGE).gitTreeState=$(if $(shell git status --porcelain),dirty,clean)
+GO_LDFLAGS +="
 
-LDFLAGS = -X "hyperpaas.Revision=$(COMMIT)" -X "hyperpaas.Version=$(VERSION)"
-PACKAGES = $(shell go list ./... | grep -v /vendor/)
+GO_FILES := $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 
+.PHONY: release
 release:
 	@echo "Release v$(version)"
 	@git pull
@@ -27,44 +35,93 @@ release:
 	@git checkout develop
 	@echo "Release v$(version) finished."
 
+.PHONY: all
 all: deps build test
 
+.PHONY: deps
+deps:
+	@go mod download
+
+.PHONY: clean
 clean:
 	@go clean -i ./...
 
-deps:
-	@glide install
+generate: $(GO_FILES)
+	@go generate ./...
 
-fmt:
-	@go fmt $(PACKAGES)
+$(BUILD_DIR)/coverage.out: $(GO_FILES)
+	@CGO_ENABLED=0  go test -cover -coverprofile $(BUILD_DIR)/coverage.out.tmp ./...
+	@cat $(BUILD_DIR)/coverage.out.tmp | grep -v '.pb.go' | grep -v 'mock_' > $(BUILD_DIR)/coverage.out
+	@rm $(BUILD_DIR)/coverage.out.tmp
 
-vet:
-	@go vet $(PACKAGES)
-
-test:
-	@go test -ldflags '-s -w $(LDFLAGS)' ./...
-
-cover:
-	@go test -ldflags '-s -w $(LDFLAGS)' -cover -covermode=set -coverprofile=coverage.out ./...
+.PHONY: ci-test
+ci-test:
+	@go test -race -cover -coverprofile ./coverage.out.tmp -v ./... | go2xunit -fail -output tests.xml
+	@cat ./coverage.out.tmp | grep -v '.pb.go' | grep -v 'mock_' > ./coverage.out
+	@rm ./coverage.out.tmp
+	@echo ""
 	@go tool cover -func ./coverage.out
 
-docker:
-	#@sudo docker build --no-cache=true --rm -t $(IMAGE) .
-	@sudo docker build --rm -t $(IMAGE) .
+.PHONY: lint
+lint:
+	@CGO_ENABLED=0 golangci-lint run ./...
 
-publish: docker
-	@sudo docker tag $(IMAGE) $(IMAGE):latest
-	@sudo docker push $(IMAGE)
+.PHONY: test
+test: $(BUILD_DIR)/coverage.out
 
-bindata.go: docs/index.html docs/swagger.yaml
-	@echo "Bin data..."
-	@go-bindata docs/
+.PHONY: coverage
+coverage: $(BUILD_DIR)/coverage.out
+	@echo ""
+	@go tool cover -func ./$(BUILD_DIR)/coverage.out
 
-$(EXECUTABLE): $(shell find . -type f -print | grep -v vendor | grep "\.go")
-	@echo "Building $(EXECUTABLE)..."
-	@CGO_ENABLED=0 go build -ldflags '-s -w $(LDFLAGS)' ./cmd/hyperpaas/
+.PHONY: coverage-html
+coverage-html: $(BUILD_DIR)/coverage.out
+	@go tool cover -html ./$(BUILD_DIR)/coverage.out
 
-build: $(EXECUTABLE)
+
+# Build targets
+
+${BUILD_DIR}/hyperpaas-starter: $(GO_FILES)
+	@echo "Building $@..."
+	@go generate ./cmd/$(subst ${BUILD_DIR}/,,$@)/
+	@go build -ldflags $(GO_LDFLAGS) -o $@ ./cmd/$(subst ${BUILD_DIR}/,,$@)/
+
+${BUILD_DIR}/hyperpaas-installer: $(GO_FILES)
+	@echo "Building $@..."
+	@go generate ./cmd/$(subst ${BUILD_DIR}/,,$@)/
+	@go build -ldflags $(GO_LDFLAGS) -o $@ ./cmd/$(subst ${BUILD_DIR}/,,$@)/
+
+${BUILD_DIR}/hyperpaas-server: $(GO_FILES)
+	@echo "Building $@..."
+	@go generate ./cmd/$(subst ${BUILD_DIR}/,,$@)/
+	@go build -ldflags $(GO_LDFLAGS) -o $@ ./cmd/$(subst ${BUILD_DIR}/,,$@)/
+
+.PHONY: build
+build: ${BUILD_DIR}/hyperpaas-starter ${BUILD_DIR}/hyperpaas-installer ${BUILD_DIR}/hyperpaas-server
+
+
+# Docker targets
+
+docker: docker-hyperpaas-starter docker-hyperpaas-installer docker-hyperpaas-server docker-hyperpaas-manager
+
+.PHONY: docker-hyperpaas-starter
+docker-hyperpaas-starter: _docker-hyperpaas-starter
+
+.PHONY: docker-hyperpaas-installer
+docker-hyperpaas-installer: _docker-hyperpaas-installer
+
+.PHONY: docker-hyperpaas-server
+docker-hyperpaas-server: _docker-hyperpaas-server
+
+.PHONY: docker-hyperpaas-manager
+docker-hyperpaas-manager: _docker-hyperpaas-manager
+
+_docker-%:
+	@docker build -f cmd/$*/Dockerfile -t 127.0.0.1:5000/$*:latest .
+	@docker image push 127.0.0.1:5000/$*
+
+
+# Run targets
 
 run: docker
 	@sudo docker run -p 8578:8080 \
@@ -74,48 +131,23 @@ run: docker
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		--rm $(IMAGE)
 
-docker-dev:
-	@GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags '-s -w $(LDFLAGS)' ./cmd/hyperpaas/
-	@sudo docker build --rm -t $(IMAGE) -f Dockerfile.dev .
+.PHONY: run-hyperpaas-server
+run-hyperpaas-server: ${BUILD_DIR}/hyperpaas-server
+	@echo "Running $<..."
+	@./$< --config=./cmd/$*/config.yml
 
-dev: docker-dev
-	@sudo docker run --rm -p 8181:8080 \
-		-e "USERNAME=dacteev" \
-		-e "PASSWORD=test" \
-		-v $(shell pwd)/var/lib/hyperpaas:/var/lib/hyperpaas \
-		-v /var/run/docker.sock:/var/run/docker.sock \
-		-v $(shell pwd)/ui/dist:/opt/hyperpaas/ui \
-		--rm $(IMAGE)
+.PHONY: run-hyperpaas-starter
+run-hyperpaas-starter: ${BUILD_DIR}/hyperpaas-starter
+	@echo "Running $<..."
+	@./$<
 
-dev-ui:
-	@cd ui; ng build --sourcemaps --watch --base-href=/ui/ --aot -dev
 
-build-hyperpaas-server: $(shell find . -type f -print | grep -v vendor | grep "\.go")
-	@echo "Building hyperpaas-server..."
-	@go generate ./cmd/hyperpaas-server/
-	@CGO_ENABLED=0 go build ./cmd/hyperpaas-server/
+# Swarm targets
 
-run-hyperpaas-server: build-hyperpaas-server
-	./hyperpaas-server
-
-build-hyperpaas-starter: $(shell find . -type f -print | grep -v vendor | grep "\.go")
-	@echo "Building hyperpaas-starter..."
-	@go generate ./cmd/hyperpaas-starter/
-	@CGO_ENABLED=0 go build ./cmd/hyperpaas-starter/
-
-run-hyperpaas-starter: build-hyperpaas-starter
-	./hyperpaas-starter
-
-build-hyperpaas-installer: $(shell find . -type f -print | grep -v vendor | grep "\.go")
-	@echo "Building hyperpaas-installer..."
-	@go generate ./cmd/hyperpaas-installer/
-	@CGO_ENABLED=0 go build ./cmd/hyperpaas-installer/
-
-run-hyperpaas-installer: build-hyperpaas-installer
-	./hyperpaas-installer
-
+.PHONY: stack-deploy-dev
 stack-deploy-dev:
 	@docker stack deploy -c dev/docker-compose.yml acme
 
+.PHONY: stack-deploy-installer
 stack-deploy-installer:
 	@docker stack deploy -c cmd/hyperpaas-installer/docker-compose.yml hyperpaas
