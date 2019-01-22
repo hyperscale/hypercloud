@@ -9,9 +9,10 @@ import (
 	"net/http"
 
 	"github.com/docker/docker/api/types"
-	"github.com/euskadi31/go-server"
+	server "github.com/euskadi31/go-server"
+	"github.com/euskadi31/go-server/response"
 	"github.com/gorilla/mux"
-	"github.com/hyperscale/hyperpaas/docker"
+	"github.com/hyperscale/hyperpaas/pkg/hyperpaas/docker"
 	"github.com/rs/zerolog/log"
 )
 
@@ -38,7 +39,7 @@ func NewTopologyController(dockerClient *docker.Client) (*TopologyController, er
 
 // Mount endpoints
 func (c TopologyController) Mount(r *server.Router) {
-	r.AddRouteFunc("/v1/topologies/{name:[a-z]+}", c.GetTopologiesHandler).Methods(http.MethodGet)
+	r.HandleFunc("/v1/topologies/{name:[a-z]+}", c.GetTopologiesHandler).Methods(http.MethodGet)
 }
 
 // GetTopologiesHandler endpoint
@@ -50,7 +51,7 @@ func (c TopologyController) GetTopologiesHandler(w http.ResponseWriter, r *http.
 	label := params["name"]
 
 	if _, ok := acceptedLabels[label]; !ok {
-		server.FailureFromError(w, http.StatusNotFound, fmt.Errorf("URL %s not found", r.URL.Path))
+		response.FailureFromError(w, http.StatusNotFound, fmt.Errorf("URL %s not found", r.URL.Path))
 
 		log.Error().Msgf("Topology %s is not valid", label)
 
@@ -59,7 +60,7 @@ func (c TopologyController) GetTopologiesHandler(w http.ResponseWriter, r *http.
 
 	nodes, err := c.dockerClient.NodeList(ctx, types.NodeListOptions{})
 	if err != nil {
-		server.FailureFromError(w, http.StatusInternalServerError, err)
+		response.FailureFromError(w, http.StatusInternalServerError, err)
 
 		log.Error().Err(err).Msg("docker.NodeList")
 
@@ -89,5 +90,5 @@ func (c TopologyController) GetTopologiesHandler(w http.ResponseWriter, r *http.
 		list = append(list, value)
 	}
 
-	server.JSON(w, http.StatusOK, list)
+	response.Encode(w, r, http.StatusOK, list)
 }

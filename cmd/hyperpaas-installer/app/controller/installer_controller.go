@@ -22,9 +22,9 @@ import (
 	dockerclient "github.com/docker/docker/client"
 	"github.com/euskadi31/go-server"
 	"github.com/euskadi31/go-sse"
-	"github.com/hyperscale/hyperpaas/cmd/hyperpaas-installer/assets"
-	"github.com/hyperscale/hyperpaas/docker"
-	"github.com/hyperscale/hyperpaas/docker/compose"
+	"github.com/hyperscale/hyperpaas/cmd/hyperpaas-installer/app/asset"
+	"github.com/hyperscale/hyperpaas/pkg/hyperpaas/docker"
+	"github.com/hyperscale/hyperpaas/pkg/hyperpaas/docker/compose"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/crypto/bcrypt"
@@ -46,29 +46,29 @@ type Event struct {
 }
 
 // InstallerController struct
-type InstallerController struct {
+type installerController struct {
 	dockerClient *docker.Client
 	events       chan interface{}
 }
 
 // NewInstallerController func
-func NewInstallerController(dockerClient *docker.Client) (*InstallerController, error) {
-	return &InstallerController{
+func NewInstallerController(dockerClient *docker.Client) server.Controller {
+	return &installerController{
 		dockerClient: dockerClient,
 		events:       make(chan interface{}, 10),
-	}, nil
+	}
 }
 
 // Mount endpoints
-func (c InstallerController) Mount(r *server.Router) {
+func (c installerController) Mount(r *server.Router) {
 	events := sse.NewServer(c.getEventsHandler)
 	events.SetRetry(time.Second * 5)
 
-	r.AddRoute("/installer/events", events).Methods(http.MethodGet)
-	r.AddRouteFunc("/installer", c.postInstallerHandler).Methods(http.MethodPost)
+	r.Handle("/installer/events", events).Methods(http.MethodGet)
+	r.HandleFunc("/installer", c.postInstallerHandler).Methods(http.MethodPost)
 }
 
-func (c *InstallerController) postInstallerHandler(w http.ResponseWriter, r *http.Request) {
+func (c *installerController) postInstallerHandler(w http.ResponseWriter, r *http.Request) {
 	// ctx := r.Context()
 	ctx := context.Background()
 

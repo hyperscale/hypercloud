@@ -4,7 +4,7 @@
 
 package response
 
-import "github.com/hyperscale/hyperpaas/http/request"
+import "github.com/hyperscale/hyperpaas/pkg/hyperpaas/http/request"
 
 // ServiceCreateResponse struct
 type ServiceCreateResponse struct {

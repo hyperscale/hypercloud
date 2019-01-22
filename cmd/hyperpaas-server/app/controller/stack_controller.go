@@ -11,10 +11,12 @@ import (
 	"github.com/asdine/storm"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
-	"github.com/euskadi31/go-server"
+	server "github.com/euskadi31/go-server"
+	"github.com/euskadi31/go-server/request"
+	"github.com/euskadi31/go-server/response"
 	"github.com/gorilla/mux"
-	"github.com/hyperscale/hyperpaas/database/entity"
-	"github.com/hyperscale/hyperpaas/docker"
+	"github.com/hyperscale/hyperpaas/pkg/hyperpaas/database/entity"
+	"github.com/hyperscale/hyperpaas/pkg/hyperpaas/docker"
 	"github.com/rs/zerolog/log"
 )
 
@@ -22,11 +24,11 @@ import (
 type StackController struct {
 	dockerClient *docker.Client
 	db           *storm.DB
-	validator    *server.Validator
+	validator    *request.Validator
 }
 
 // NewStackController func
-func NewStackController(dockerClient *docker.Client, db *storm.DB, validator *server.Validator) (*StackController, error) {
+func NewStackController(dockerClient *docker.Client, db *storm.DB, validator *request.Validator) (*StackController, error) {
 	if err := db.Init(&entity.Stack{}); err != nil {
 		return nil, err
 	}
@@ -40,12 +42,12 @@ func NewStackController(dockerClient *docker.Client, db *storm.DB, validator *se
 
 // Mount endpoints
 func (c StackController) Mount(r *server.Router) {
-	r.AddRouteFunc("/v1/stacks", c.getStacksHandler).Methods(http.MethodGet)
-	r.AddRouteFunc("/v1/stacks", c.postStacksHandler).Methods(http.MethodPost)
-	// r.AddRouteFunc("/v1/stacks/{id:[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}}", c.getStackHandler).Methods(http.MethodGet)
-	// r.AddRouteFunc("/v1/stacks/{id:[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}}/services", c.getStackServicesHandler).Methods(http.MethodGet)
+	r.HandleFunc("/v1/stacks", c.getStacksHandler).Methods(http.MethodGet)
+	r.HandleFunc("/v1/stacks", c.postStacksHandler).Methods(http.MethodPost)
+	// r.HandleFunc("/v1/stacks/{id:[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}}", c.getStackHandler).Methods(http.MethodGet)
+	// r.HandleFunc("/v1/stacks/{id:[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}}/services", c.getStackServicesHandler).Methods(http.MethodGet)
 
-	r.AddRouteFunc("/v1/stacks/{id:[a-z]+(?:-[a-z0-9]+)*}/services", c.getStackServicesHandler).Methods(http.MethodGet)
+	r.HandleFunc("/v1/stacks/{id:[a-z]+(?:-[a-z0-9]+)*}/services", c.getStackServicesHandler).Methods(http.MethodGet)
 }
 
 // swagger:route GET /v1/stacks Stack getStacksHandler
@@ -66,7 +68,7 @@ func (c StackController) getStacksHandler(w http.ResponseWriter, r *http.Request
 		if err := c.db.All(&stacks); err != nil {
 			log.Error().Err(err).Msg("Get All Stacks")
 
-			server.FailureFromError(w, http.StatusInternalServerError, err)
+			response.FailureFromError(w, http.StatusInternalServerError, err)
 
 			return
 		}
@@ -84,7 +86,7 @@ func (c StackController) getStacksHandler(w http.ResponseWriter, r *http.Request
 		if err != nil {
 			log.Error().Err(err).Msg("StackList")
 
-			server.FailureFromError(w, http.StatusInternalServerError, err)
+			response.FailureFromError(w, http.StatusInternalServerError, err)
 
 			return
 		}
@@ -94,13 +96,13 @@ func (c StackController) getStacksHandler(w http.ResponseWriter, r *http.Request
 		}
 	}
 
-	response := []docker.Stack{}
+	resp := []docker.Stack{}
 
 	for _, stack := range stackMap {
-		response = append(response, stack)
+		resp = append(resp, stack)
 	}
 
-	server.JSON(w, http.StatusOK, response)
+	response.Encode(w, r, http.StatusOK, resp)
 }
 
 // swagger:route POST /v1/stacks Stack postStacksHandler
@@ -118,7 +120,7 @@ func (c StackController) postStacksHandler(w http.ResponseWriter, r *http.Reques
 	if err := json.NewDecoder(r.Body).Decode(stack); err != nil {
 		log.Error().Err(err).Msg("Decode body request")
 
-		server.FailureFromError(w, http.StatusBadRequest, err)
+		response.FailureFromError(w, http.StatusBadRequest, err)
 
 		return
 	}
@@ -126,7 +128,7 @@ func (c StackController) postStacksHandler(w http.ResponseWriter, r *http.Reques
 	if result := c.validator.Validate("stack", stack); !result.IsValid() {
 		log.Error().Err(result.AsError()).Msg("Validate body request")
 
-		server.FailureFromValidator(w, result)
+		response.FailureFromValidator(w, result)
 
 		return
 	}
@@ -134,12 +136,12 @@ func (c StackController) postStacksHandler(w http.ResponseWriter, r *http.Reques
 	if err := c.db.Save(stack); err != nil {
 		log.Error().Err(err).Msg("Save Stack")
 
-		server.FailureFromError(w, http.StatusInternalServerError, err)
+		response.FailureFromError(w, http.StatusInternalServerError, err)
 
 		return
 	}
 
-	server.JSON(w, http.StatusCreated, stack)
+	response.Encode(w, r, http.StatusCreated, stack)
 }
 
 // swagger:route GET /v1/stacks/{id} Stack getStackHandler
@@ -159,12 +161,12 @@ func (c StackController) getStackHandler(w http.ResponseWriter, r *http.Request)
 	stack := &entity.Stack{}
 
 	if err := c.db.One("ID", id, stack); err != nil {
-		server.FailureFromError(w, http.StatusNotFound, err)
+		response.FailureFromError(w, http.StatusNotFound, err)
 
 		return
 	}
 
-	server.JSON(w, http.StatusOK, stack)
+	response.Encode(w, r, http.StatusOK, stack)
 }
 
 // swagger:route POST /v1/stacks/{id}/services Stack getStackServicesHandler
@@ -192,10 +194,10 @@ func (c StackController) getStackServicesHandler(w http.ResponseWriter, r *http.
 	if err != nil {
 		log.Error().Err(err).Msg("ServiceList")
 
-		server.FailureFromError(w, http.StatusInternalServerError, err)
+		response.FailureFromError(w, http.StatusInternalServerError, err)
 
 		return
 	}
 
-	server.JSON(w, http.StatusOK, services)
+	response.Encode(w, r, http.StatusOK, services)
 }

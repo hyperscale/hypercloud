@@ -16,14 +16,16 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/swarm"
-	"github.com/euskadi31/go-server"
-	"github.com/euskadi31/go-sse"
+	server "github.com/euskadi31/go-server"
+	srequest "github.com/euskadi31/go-server/request"
+	sresponse "github.com/euskadi31/go-server/response"
+	sse "github.com/euskadi31/go-sse"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/schema"
-	"github.com/hyperscale/hyperpaas/database/entity"
-	"github.com/hyperscale/hyperpaas/docker"
-	"github.com/hyperscale/hyperpaas/http/request"
-	"github.com/hyperscale/hyperpaas/http/response"
+	"github.com/hyperscale/hyperpaas/pkg/hyperpaas/database/entity"
+	"github.com/hyperscale/hyperpaas/pkg/hyperpaas/docker"
+	"github.com/hyperscale/hyperpaas/pkg/hyperpaas/http/request"
+	"github.com/hyperscale/hyperpaas/pkg/hyperpaas/http/response"
 	"github.com/rs/zerolog/log"
 )
 
@@ -51,12 +53,12 @@ func (h ServiceHosts) String() string {
 type ServiceController struct {
 	dockerClient *docker.Client
 	db           *storm.DB
-	validator    *server.Validator
+	validator    *srequest.Validator
 	queryDecoder *schema.Decoder
 }
 
 // NewServiceController func
-func NewServiceController(dockerClient *docker.Client, db *storm.DB, validator *server.Validator) (*ServiceController, error) {
+func NewServiceController(dockerClient *docker.Client, db *storm.DB, validator *srequest.Validator) (*ServiceController, error) {
 	if err := db.Init(&entity.Service{}); err != nil {
 		return nil, err
 	}
@@ -77,11 +79,11 @@ func (c ServiceController) Mount(r *server.Router) {
 	events := sse.NewServer(c.getServiceStatsHandler)
 	events.SetRetry(time.Second * 5)
 
-	r.AddRouteFunc("/v1/services", c.getServicesHandler).Methods(http.MethodGet)
-	r.AddRouteFunc("/v1/services", c.postServiceHandler).Methods(http.MethodPost)
-	r.AddRouteFunc("/v1/services/{id:[0-9a-z]{25}}", c.getServiceHandler).Methods(http.MethodGet)
-	r.AddRouteFunc("/v1/services/{id:[0-9a-z]{25}}", c.putServiceHandler).Methods(http.MethodPut)
-	r.AddRoute("/v1/services/{id:[0-9a-z]{25}}/stats", events).Methods(http.MethodGet)
+	r.HandleFunc("/v1/services", c.getServicesHandler).Methods(http.MethodGet)
+	r.HandleFunc("/v1/services", c.postServiceHandler).Methods(http.MethodPost)
+	r.HandleFunc("/v1/services/{id:[0-9a-z]{25}}", c.getServiceHandler).Methods(http.MethodGet)
+	r.HandleFunc("/v1/services/{id:[0-9a-z]{25}}", c.putServiceHandler).Methods(http.MethodPut)
+	r.Handle("/v1/services/{id:[0-9a-z]{25}}/stats", events).Methods(http.MethodGet)
 }
 
 // swagger:route GET /v1/services Service getServicesHandler
@@ -99,7 +101,7 @@ func (c ServiceController) getServicesHandler(w http.ResponseWriter, r *http.Req
 	if err := c.queryDecoder.Decode(query, r.URL.Query()); err != nil {
 		log.Error().Err(err).Msg("Decode query parameters")
 
-		server.FailureFromError(w, http.StatusInternalServerError, err)
+		sresponse.FailureFromError(w, http.StatusInternalServerError, err)
 
 		return
 	}
@@ -116,7 +118,7 @@ func (c ServiceController) getServicesHandler(w http.ResponseWriter, r *http.Req
 	if err != nil {
 		log.Error().Err(err).Msg("ServiceList")
 
-		server.FailureFromError(w, http.StatusInternalServerError, err)
+		sresponse.FailureFromError(w, http.StatusInternalServerError, err)
 
 		return
 	}
@@ -133,7 +135,7 @@ func (c ServiceController) getServicesHandler(w http.ResponseWriter, r *http.Req
 		response = append(response, service)
 	}
 
-	server.JSON(w, http.StatusOK, response)
+	sresponse.Encode(w, r, http.StatusOK, response)
 }
 
 // swagger:route POST /v1/services Service postServiceHandler
@@ -151,7 +153,7 @@ func (c ServiceController) postServiceHandler(w http.ResponseWriter, r *http.Req
 	if err := json.NewDecoder(r.Body).Decode(service); err != nil {
 		log.Error().Err(err).Msg("Decode body request")
 
-		server.FailureFromError(w, http.StatusBadRequest, err)
+		sresponse.FailureFromError(w, http.StatusBadRequest, err)
 
 		return
 	}
@@ -159,7 +161,7 @@ func (c ServiceController) postServiceHandler(w http.ResponseWriter, r *http.Req
 	if result := c.validator.Validate("service", service); !result.IsValid() {
 		log.Error().Err(result.AsError()).Msg("Validate body request")
 
-		server.FailureFromValidator(w, result)
+		sresponse.FailureFromValidator(w, result)
 
 		return
 	}
@@ -198,7 +200,7 @@ func (c ServiceController) postServiceHandler(w http.ResponseWriter, r *http.Req
 	if err != nil {
 		log.Error().Err(err).Msg("Docker Service Create")
 
-		server.FailureFromError(w, http.StatusInternalServerError, err)
+		sresponse.FailureFromError(w, http.StatusInternalServerError, err)
 
 		return
 	}
@@ -211,7 +213,7 @@ func (c ServiceController) postServiceHandler(w http.ResponseWriter, r *http.Req
 
 	// service.Hosts = append(service.Hosts, fmt.Sprintf("%s.%s", service.Name, "hyperpaas.service"))
 
-	server.JSON(w, http.StatusCreated, response.ServiceCreateResponse{
+	sresponse.Encode(w, r, http.StatusCreated, response.ServiceCreateResponse{
 		ServiceCreateRequest: service,
 		ID:                   resp.ID,
 	})
@@ -235,12 +237,12 @@ func (c ServiceController) getServiceHandler(w http.ResponseWriter, r *http.Requ
 
 	service, _, err := c.dockerClient.ServiceInspectWithRaw(ctx, id, types.ServiceInspectOptions{})
 	if err != nil {
-		server.FailureFromError(w, http.StatusNotFound, err)
+		sresponse.FailureFromError(w, http.StatusNotFound, err)
 
 		return
 	}
 
-	server.JSON(w, http.StatusOK, service)
+	sresponse.Encode(w, r, http.StatusOK, service)
 }
 
 // swagger:route GET /v1/services/{id}/stats Stack getServiceHandler
@@ -366,7 +368,7 @@ func (c ServiceController) getServiceStatsHandler(rw sse.ResponseWriter, r *http
 			rw.Send(&sse.MessageEvent{
 				Data: stats,
 			})
-		case <-rw.CloseNotify:
+		case <-r.Context().Done():
 			close(events)
 
 			return
@@ -395,7 +397,7 @@ func (c ServiceController) putServiceHandler(w http.ResponseWriter, r *http.Requ
 	if err := json.NewDecoder(r.Body).Decode(&service); err != nil {
 		log.Error().Err(err).Msg("Unmarshal Request Body")
 
-		server.FailureFromError(w, http.StatusBadRequest, err)
+		sresponse.FailureFromError(w, http.StatusBadRequest, err)
 
 		return
 	}
@@ -404,7 +406,7 @@ func (c ServiceController) putServiceHandler(w http.ResponseWriter, r *http.Requ
 	if err != nil {
 		log.Error().Err(err).Msg("Docker Service Update")
 
-		server.FailureFromError(w, http.StatusInternalServerError, err)
+		sresponse.FailureFromError(w, http.StatusInternalServerError, err)
 
 		return
 	}
@@ -413,5 +415,5 @@ func (c ServiceController) putServiceHandler(w http.ResponseWriter, r *http.Requ
 		log.Warn().Msg(w)
 	}
 
-	server.JSON(w, http.StatusOK, service)
+	sresponse.Encode(w, r, http.StatusOK, service)
 }

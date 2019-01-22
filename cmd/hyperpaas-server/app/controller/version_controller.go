@@ -11,9 +11,10 @@ import (
 
 	"github.com/coreos/go-semver/semver"
 
-	"github.com/euskadi31/go-server"
+	server "github.com/euskadi31/go-server"
+	"github.com/euskadi31/go-server/response"
 	sse "github.com/euskadi31/go-sse"
-	"github.com/hyperscale/hyperpaas/version"
+	"github.com/hyperscale/hyperpaas/pkg/hyperpaas/version"
 	"github.com/rs/zerolog/log"
 )
 
@@ -44,8 +45,8 @@ func (c VersionController) Mount(r *server.Router) {
 	events := sse.NewServer(c.getVersionEventHandler)
 	events.SetRetry(time.Minute * 30)
 
-	r.AddRoute("/v1/version/latest", events).Methods(http.MethodGet).Headers("Accept", "text/event-stream")
-	r.AddRouteFunc("/v1/version/latest", c.getVersionHandler).Methods(http.MethodGet)
+	r.Handle("/v1/version/latest", events).Methods(http.MethodGet).Headers("Accept", "text/event-stream")
+	r.HandleFunc("/v1/version/latest", c.getVersionHandler).Methods(http.MethodGet)
 }
 
 func (c VersionController) fetcher() {
@@ -84,7 +85,7 @@ func (c *VersionController) worker() {
 //       200: Version
 //
 func (c VersionController) getVersionHandler(w http.ResponseWriter, r *http.Request) {
-	server.JSON(w, http.StatusOK, VersionResponse{
+	response.Encode(w, r, http.StatusOK, VersionResponse{
 		Current: version.Version,
 		Latest:  c.latest,
 	})
@@ -122,7 +123,7 @@ func (c VersionController) getVersionEventHandler(rw sse.ResponseWriter, r *http
 				latestNotified = c.latest
 			}
 
-		case <-rw.CloseNotify:
+		case <-r.Context().Done():
 			return
 		}
 	}

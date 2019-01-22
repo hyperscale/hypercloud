@@ -7,8 +7,8 @@ package controller
 import (
 	"net/http/httputil"
 
-	"github.com/euskadi31/go-server"
-	"github.com/hyperscale/hyperpaas/docker"
+	server "github.com/euskadi31/go-server"
+	"github.com/hyperscale/hyperpaas/pkg/hyperpaas/docker"
 )
 
 // DockerController struct
@@ -30,5 +30,5 @@ func NewDockerController(host string) (*DockerController, error) {
 
 // Mount endpoints
 func (c DockerController) Mount(r *server.Router) {
-	r.AddPrefixRoute("/docker/", c.proxy)
+	r.PathPrefix("/docker/").Handler(c.proxy)
 }

@@ -1,5 +1,5 @@
 # Server Builder
-FROM golang:1.9-alpine as installer-builder
+FROM golang:1.11-alpine as installer-builder
 WORKDIR /go/src/github.com/hyperscale/hyperpaas/
 ARG VERSION
 ARG VCS_URL
@@ -17,7 +17,7 @@ RUN dep ensure -vendor-only && \
     CGO_ENABLED=0 go build -ldflags "-X github.com/hyperscale/hyperpaas/version.Tag=${VERSION} -X github.com/hyperscale/hyperpaas/version.Revision=${VCS_REF} -X github.com/hyperscale/hyperpaas/version.BuildAt=${BUILD_DATE}" ./cmd/hyperpaas-installer/
 
 # Application
-FROM docker:17.12.0-ce-dind
+FROM docker:18.09.0-ce-dind
 ARG VERSION
 ARG VCS_URL
 ARG VCS_REF

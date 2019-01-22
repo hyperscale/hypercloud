@@ -8,25 +8,24 @@ import (
 	"net/http"
 
 	"github.com/euskadi31/go-server"
-	"github.com/hyperscale/hyperpaas/cmd/hyperpaas-installer/assets"
-	"github.com/hyperscale/hyperpaas/memfs"
+	"github.com/hyperscale/hyperpaas/cmd/hyperpaas-installer/app/asset"
+	"github.com/hyperscale/hyperpaas/pkg/hyperpaas/memfs"
 )
 
-// UIController struct
-type UIController struct {
+type uiController struct {
 }
 
 // NewUIController func
-func NewUIController() (*UIController, error) {
-	return &UIController{}, nil
+func NewUIController() server.Controller {
+	return &uiController{}
 }
 
 // Mount endpoints
-func (c UIController) Mount(r *server.Router) {
-	r.AddRouteFunc("/", c.getUIHandler).Methods(http.MethodGet)
+func (c uiController) Mount(r *server.Router) {
+	r.HandleFunc("/", c.getUIHandler).Methods(http.MethodGet)
 }
 
-func (c UIController) getUIHandler(w http.ResponseWriter, r *http.Request) {
+func (c uiController) getUIHandler(w http.ResponseWriter, r *http.Request) {
 	name := "static/index.html"
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")

@@ -11,9 +11,9 @@ import (
 	"time"
 
 	"github.com/docker/docker/api/types"
-	"github.com/euskadi31/go-server"
+	server "github.com/euskadi31/go-server"
 	sse "github.com/euskadi31/go-sse"
-	"github.com/hyperscale/hyperpaas/docker"
+	"github.com/hyperscale/hyperpaas/pkg/hyperpaas/docker"
 	"github.com/rs/zerolog/log"
 )
 
@@ -34,7 +34,7 @@ func (c EventController) Mount(r *server.Router) {
 	events := sse.NewServer(c.getEventsHandler)
 	events.SetRetry(time.Second * 5)
 
-	r.AddRoute("/v1/events", events).Methods(http.MethodGet)
+	r.Handle("/v1/events", events).Methods(http.MethodGet)
 }
 
 // swagger:route GET /v1/events Event getEventsHandler
@@ -72,7 +72,7 @@ func (c EventController) getEventsHandler(rw sse.ResponseWriter, r *http.Request
 		case err := <-errCh:
 			log.Error().Err(err).Msg("Events")
 
-		case <-rw.CloseNotify:
+		case <-r.Context().Done():
 
 			return
 		}

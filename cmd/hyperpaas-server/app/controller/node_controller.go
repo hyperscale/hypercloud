@@ -9,8 +9,10 @@ import (
 
 	"github.com/asdine/storm"
 	"github.com/docker/docker/api/types"
-	"github.com/euskadi31/go-server"
-	"github.com/hyperscale/hyperpaas/docker"
+	server "github.com/euskadi31/go-server"
+	"github.com/euskadi31/go-server/request"
+	"github.com/euskadi31/go-server/response"
+	"github.com/hyperscale/hyperpaas/pkg/hyperpaas/docker"
 	"github.com/rs/zerolog/log"
 )
 
@@ -18,11 +20,11 @@ import (
 type NodeController struct {
 	dockerClient *docker.Client
 	db           *storm.DB
-	validator    *server.Validator
+	validator    *request.Validator
 }
 
 // NewNodeController func
-func NewNodeController(dockerClient *docker.Client, db *storm.DB, validator *server.Validator) (*NodeController, error) {
+func NewNodeController(dockerClient *docker.Client, db *storm.DB, validator *request.Validator) (*NodeController, error) {
 	return &NodeController{
 		dockerClient: dockerClient,
 		db:           db,
@@ -32,7 +34,7 @@ func NewNodeController(dockerClient *docker.Client, db *storm.DB, validator *ser
 
 // Mount endpoints
 func (c NodeController) Mount(r *server.Router) {
-	r.AddRouteFunc("/v1/nodes", c.getNodesHandler).Methods(http.MethodGet)
+	r.HandleFunc("/v1/nodes", c.getNodesHandler).Methods(http.MethodGet)
 }
 
 // swagger:route GET /v1/nodes Node getNodesHandler
@@ -49,10 +51,10 @@ func (c NodeController) getNodesHandler(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		log.Error().Err(err).Msg("NodeList")
 
-		server.FailureFromError(w, http.StatusInternalServerError, err)
+		response.FailureFromError(w, http.StatusInternalServerError, err)
 
 		return
 	}
 
-	server.JSON(w, http.StatusOK, nodes)
+	response.Encode(w, r, http.StatusOK, nodes)
 }

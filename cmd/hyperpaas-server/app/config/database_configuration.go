@@ -2,6 +2,9 @@
 // Use of this source code is governed by a MIT
 // license that can be found in the LICENSE file.
 
-package main
+package config
 
-//go:generate go-bindata -pkg asset -prefix app/ -o app/asset/asset.go app/static/...
+// DatabaseConfiguration struct
+type DatabaseConfiguration struct {
+	Path string
+}

@@ -13,9 +13,11 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/asdine/storm"
-	"github.com/euskadi31/go-server"
-	"github.com/hyperscale/hyperpaas/docker"
-	"github.com/hyperscale/hyperpaas/provider/vcs/bitbucket"
+	server "github.com/euskadi31/go-server"
+	"github.com/euskadi31/go-server/request"
+	"github.com/euskadi31/go-server/response"
+	"github.com/hyperscale/hyperpaas/pkg/hyperpaas/docker"
+	"github.com/hyperscale/hyperpaas/pkg/hyperpaas/provider/vcs/bitbucket"
 )
 
 // PushEvent struct
@@ -28,11 +30,11 @@ type PushEvent struct {
 type DeployController struct {
 	dockerClient *docker.Client
 	db           *storm.DB
-	validator    *server.Validator
+	validator    *request.Validator
 }
 
 // NewDeployController func
-func NewDeployController(dockerClient *docker.Client, db *storm.DB, validator *server.Validator) (*DeployController, error) {
+func NewDeployController(dockerClient *docker.Client, db *storm.DB, validator *request.Validator) (*DeployController, error) {
 	return &DeployController{
 		dockerClient: dockerClient,
 		db:           db,
@@ -42,7 +44,7 @@ func NewDeployController(dockerClient *docker.Client, db *storm.DB, validator *s
 
 // Mount endpoints
 func (c DeployController) Mount(r *server.Router) {
-	r.AddRouteFunc("/v1/deploy/{id:[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}}/hooks/{provider:[a-z]+}", c.postDeployHookHandler).Methods(http.MethodPost)
+	r.HandleFunc("/v1/deploy/{id:[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}}/hooks/{provider:[a-z]+}", c.postDeployHookHandler).Methods(http.MethodPost)
 }
 
 // swagger:route GET /v1/deploy/{application_id}/hooks/{provider} Deploy postDeployHookHandler
@@ -74,18 +76,18 @@ func (c DeployController) postDeployHookHandler(w http.ResponseWriter, r *http.R
 	case "gitlab":
 		event, err = c.parseGitlabEvent(r)
 	default:
-		server.FailureFromError(w, http.StatusNotFound, fmt.Errorf("URL %s not found", r.URL.Path))
+		response.FailureFromError(w, http.StatusNotFound, fmt.Errorf("URL %s not found", r.URL.Path))
 
 		return
 	}
 
 	if err != nil {
-		server.FailureFromError(w, http.StatusBadRequest, err)
+		response.FailureFromError(w, http.StatusBadRequest, err)
 
 		return
 	}
 
-	server.JSON(w, http.StatusOK, event)
+	response.Encode(w, r, http.StatusOK, event)
 }
 
 //@TODO move this in provider
