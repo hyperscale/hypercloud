@@ -5,6 +5,8 @@
 package container
 
 import (
+	"os"
+
 	service "github.com/euskadi31/go-service"
 	"github.com/hyperscale/hyperpaas/pkg/hyperpaas/docker"
 	"github.com/rs/zerolog/log"
@@ -17,6 +19,8 @@ const (
 
 func init() {
 	service.Set(DockerKey, func(c service.Container) interface{} {
+		os.Setenv("DOCKER_API_VERSION", "1.39")
+
 		dc, err := docker.NewEnvClient()
 		if err != nil {
 			log.Fatal().Err(err).Msg(DockerKey)

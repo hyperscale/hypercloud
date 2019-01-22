@@ -26,10 +26,13 @@ func init() {
 
 		zerolog.SetGlobalLevel(cfg.Logger.Level())
 
+		zerolog.CallerSkipFrameCount = 2
+
 		logger := zerolog.New(os.Stdout).With().
 			Timestamp().
 			Str("role", cfg.Logger.Prefix).
 			Str("version", version.Get().Version).
+			Caller().
 			Logger()
 
 		fi, err := os.Stdin.Stat()

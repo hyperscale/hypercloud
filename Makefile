@@ -134,7 +134,7 @@ run: docker
 .PHONY: run-hyperpaas-server
 run-hyperpaas-server: ${BUILD_DIR}/hyperpaas-server
 	@echo "Running $<..."
-	@./$< --config=./cmd/$*/config.yml
+	./$< --config=./cmd/$(subst ${BUILD_DIR}/,,$<)/config.yml
 
 .PHONY: run-hyperpaas-starter
 run-hyperpaas-starter: ${BUILD_DIR}/hyperpaas-starter

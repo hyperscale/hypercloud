@@ -11,6 +11,7 @@ import (
 	server "github.com/euskadi31/go-server"
 	"github.com/euskadi31/go-server/response"
 	service "github.com/euskadi31/go-service"
+	"github.com/gorilla/handlers"
 	"github.com/hyperscale/hyperpaas/cmd/hyperpaas-server/app/config"
 	"github.com/hyperscale/hyperpaas/pkg/hyperpaas/docker"
 	hlogger "github.com/hyperscale/hyperpaas/pkg/hyperpaas/logger"
@@ -45,7 +46,16 @@ func init() {
 		router.Use(hlog.RefererHandler("referer"))
 		router.Use(hlog.RequestIDHandler("req_id", "Request-Id"))
 
-		router.EnableCors()
+		router.EnableCorsWithOptions(handlers.AllowedHeaders([]string{
+			"Authorization",
+			"Content-Type",
+			"X-Requested-With",
+		}), handlers.AllowedMethods([]string{
+			http.MethodGet,
+			http.MethodPost,
+			http.MethodDelete,
+			http.MethodOptions,
+		}))
 		router.EnableHealthCheck()
 		router.EnableRecovery()
 

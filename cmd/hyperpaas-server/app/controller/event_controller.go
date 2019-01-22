@@ -72,6 +72,8 @@ func (c EventController) getEventsHandler(rw sse.ResponseWriter, r *http.Request
 		case err := <-errCh:
 			log.Error().Err(err).Msg("Events")
 
+			time.Sleep(30 * time.Second)
+
 		case <-r.Context().Done():
 
 			return
