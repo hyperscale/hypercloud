@@ -20,8 +20,9 @@ import (
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/swarm"
 	dockerclient "github.com/docker/docker/client"
-	"github.com/euskadi31/go-server"
-	"github.com/euskadi31/go-sse"
+	server "github.com/euskadi31/go-server"
+	"github.com/euskadi31/go-server/response"
+	sse "github.com/euskadi31/go-sse"
 	"github.com/hyperscale/hyperpaas/cmd/hyperpaas-installer/app/asset"
 	"github.com/hyperscale/hyperpaas/pkg/hyperpaas/docker"
 	"github.com/hyperscale/hyperpaas/pkg/hyperpaas/docker/compose"
@@ -73,7 +74,7 @@ func (c *installerController) postInstallerHandler(w http.ResponseWriter, r *htt
 	ctx := context.Background()
 
 	if err := r.ParseMultipartForm(2048); err != nil {
-		server.FailureFromError(w, http.StatusRequestEntityTooLarge, err)
+		response.FailureFromError(w, http.StatusRequestEntityTooLarge, err)
 
 		return
 	}
@@ -85,9 +86,9 @@ func (c *installerController) postInstallerHandler(w http.ResponseWriter, r *htt
 		Action: "started",
 	}
 
-	content, err := assets.Asset("static/config/docker-compose.yml")
+	content, err := asset.Asset("static/config/docker-compose.yml")
 	if err != nil {
-		server.FailureFromError(w, http.StatusInternalServerError, err)
+		response.FailureFromError(w, http.StatusInternalServerError, err)
 
 		return
 	}
@@ -102,7 +103,7 @@ func (c *installerController) postInstallerHandler(w http.ResponseWriter, r *htt
 		"DOMAIN": r.PostForm.Get("domain"),
 	})
 	if err != nil {
-		server.FailureFromError(w, http.StatusInternalServerError, err)
+		response.FailureFromError(w, http.StatusInternalServerError, err)
 
 		c.events <- Event{
 			Type:   "compose",
@@ -366,10 +367,10 @@ func (c *installerController) postInstallerHandler(w http.ResponseWriter, r *htt
 		}
 	}()
 
-	server.JSON(w, http.StatusOK, composeConfig)
+	response.Encode(w, r, http.StatusOK, composeConfig)
 }
 
-func (c *InstallerController) getEventsHandler(rw sse.ResponseWriter, r *http.Request) {
+func (c *installerController) getEventsHandler(rw sse.ResponseWriter, r *http.Request) {
 	for {
 		select {
 		case event := <-c.events:
@@ -384,7 +385,7 @@ func (c *InstallerController) getEventsHandler(rw sse.ResponseWriter, r *http.Re
 				Data: data,
 			})
 
-		case <-rw.CloseNotify:
+		case <-r.Context().Done():
 
 			return
 		}

@@ -19,6 +19,7 @@ type Stack struct {
 }
 
 // swagger:response Stack
+//nolint:deadcode
 type stackResponseDoc struct {
 	// in: body
 	Body Stack

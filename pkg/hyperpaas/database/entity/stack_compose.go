@@ -29,6 +29,7 @@ type StackCompose struct {
 }
 
 // swagger:response StackCompose
+//nolint:deadcode
 type stackComposeResponseDoc struct {
 	// in: body
 	Body StackCompose

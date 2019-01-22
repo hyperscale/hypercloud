@@ -7,7 +7,8 @@ package controller
 import (
 	"net/http"
 
-	"github.com/euskadi31/go-server"
+	server "github.com/euskadi31/go-server"
+	"github.com/euskadi31/go-server/response"
 	"github.com/hyperscale/hyperpaas/cmd/hyperpaas-installer/app/asset"
 	"github.com/hyperscale/hyperpaas/pkg/hyperpaas/memfs"
 )
@@ -30,16 +31,16 @@ func (c uiController) getUIHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	body, err := assets.Asset(name)
+	body, err := asset.Asset(name)
 	if err != nil {
-		server.FailureFromError(w, http.StatusInternalServerError, err)
+		response.FailureFromError(w, http.StatusInternalServerError, err)
 
 		return
 	}
 
-	info, err := assets.AssetInfo(name)
+	info, err := asset.AssetInfo(name)
 	if err != nil {
-		server.FailureFromError(w, http.StatusInternalServerError, err)
+		response.FailureFromError(w, http.StatusInternalServerError, err)
 
 		return
 	}

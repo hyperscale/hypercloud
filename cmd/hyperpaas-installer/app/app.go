@@ -5,14 +5,16 @@
 package app
 
 import (
+	"context"
+	"fmt"
 	"os"
 	"os/signal"
-	"context"
 	"syscall"
 
 	server "github.com/euskadi31/go-server"
 	service "github.com/euskadi31/go-service"
 	"github.com/hyperscale/hyperpaas/cmd/hyperpaas-installer/app/container"
+	"github.com/hyperscale/hyperpaas/pkg/hyperpaas/docker"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
