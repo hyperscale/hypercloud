@@ -2,9 +2,9 @@ BUILD_DIR ?= build
 COMMIT = $(shell git rev-parse HEAD)
 VERSION ?= $(shell git describe --always --tags --dirty)
 ORG := github.com/hyperscale
-PROJECT := hyperpaas
+PROJECT := hypercloud
 REPOPATH ?= $(ORG)/$(PROJECT)
-VERSION_PACKAGE = $(REPOPATH)/pkg/hyperpaas/version
+VERSION_PACKAGE = $(REPOPATH)/pkg/hypercloud/version
 
 GO_LDFLAGS :="
 GO_LDFLAGS += -X $(VERSION_PACKAGE).version=$(VERSION)
@@ -81,40 +81,40 @@ coverage-html: $(BUILD_DIR)/coverage.out
 
 # Build targets
 
-${BUILD_DIR}/hyperpaas-starter: $(GO_FILES)
+${BUILD_DIR}/hypercloud-starter: $(GO_FILES)
 	@echo "Building $@..."
 	@go generate ./cmd/$(subst ${BUILD_DIR}/,,$@)/
 	@go build -ldflags $(GO_LDFLAGS) -o $@ ./cmd/$(subst ${BUILD_DIR}/,,$@)/
 
-${BUILD_DIR}/hyperpaas-installer: $(GO_FILES)
+${BUILD_DIR}/hypercloud-installer: $(GO_FILES)
 	@echo "Building $@..."
 	@go generate ./cmd/$(subst ${BUILD_DIR}/,,$@)/
 	@go build -ldflags $(GO_LDFLAGS) -o $@ ./cmd/$(subst ${BUILD_DIR}/,,$@)/
 
-${BUILD_DIR}/hyperpaas-server: $(GO_FILES)
+${BUILD_DIR}/hypercloud-server: $(GO_FILES)
 	@echo "Building $@..."
 	@go generate ./cmd/$(subst ${BUILD_DIR}/,,$@)/
 	@go build -ldflags $(GO_LDFLAGS) -o $@ ./cmd/$(subst ${BUILD_DIR}/,,$@)/
 
 .PHONY: build
-build: ${BUILD_DIR}/hyperpaas-starter ${BUILD_DIR}/hyperpaas-installer ${BUILD_DIR}/hyperpaas-server
+build: ${BUILD_DIR}/hypercloud-starter ${BUILD_DIR}/hypercloud-installer ${BUILD_DIR}/hypercloud-server
 
 
 # Docker targets
 
-docker: docker-hyperpaas-starter docker-hyperpaas-installer docker-hyperpaas-server docker-hyperpaas-manager
+docker: docker-hypercloud-starter docker-hypercloud-installer docker-hypercloud-server docker-hypercloud-manager
 
-.PHONY: docker-hyperpaas-starter
-docker-hyperpaas-starter: _docker-hyperpaas-starter
+.PHONY: docker-hypercloud-starter
+docker-hypercloud-starter: _docker-hypercloud-starter
 
-.PHONY: docker-hyperpaas-installer
-docker-hyperpaas-installer: _docker-hyperpaas-installer
+.PHONY: docker-hypercloud-installer
+docker-hypercloud-installer: _docker-hypercloud-installer
 
-.PHONY: docker-hyperpaas-server
-docker-hyperpaas-server: _docker-hyperpaas-server
+.PHONY: docker-hypercloud-server
+docker-hypercloud-server: _docker-hypercloud-server
 
-.PHONY: docker-hyperpaas-manager
-docker-hyperpaas-manager: _docker-hyperpaas-manager
+.PHONY: docker-hypercloud-manager
+docker-hypercloud-manager: _docker-hypercloud-manager
 
 _docker-%:
 	@docker build -f cmd/$*/Dockerfile -t 127.0.0.1:5000/$*:latest .
@@ -127,17 +127,17 @@ run: docker
 	@sudo docker run -p 8578:8080 \
 		-e "USERNAME=dacteev" \
 		-e "PASSWORD=test" \
-		-v $(shell pwd)/var/lib/hyperpaas:/var/lib/hyperpaas \
+		-v $(shell pwd)/var/lib/hypercloud:/var/lib/hypercloud \
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		--rm $(IMAGE)
 
-.PHONY: run-hyperpaas-server
-run-hyperpaas-server: ${BUILD_DIR}/hyperpaas-server
+.PHONY: run-hypercloud-server
+run-hypercloud-server: ${BUILD_DIR}/hypercloud-server
 	@echo "Running $<..."
 	./$< --config=./cmd/$(subst ${BUILD_DIR}/,,$<)/config.yml
 
-.PHONY: run-hyperpaas-starter
-run-hyperpaas-starter: ${BUILD_DIR}/hyperpaas-starter
+.PHONY: run-hypercloud-starter
+run-hypercloud-starter: ${BUILD_DIR}/hypercloud-starter
 	@echo "Running $<..."
 	@./$<
 
@@ -150,4 +150,4 @@ stack-deploy-dev:
 
 .PHONY: stack-deploy-installer
 stack-deploy-installer:
-	@docker stack deploy -c cmd/hyperpaas-installer/docker-compose.yml hyperpaas
+	@docker stack deploy -c cmd/hypercloud-installer/docker-compose.yml hypercloud

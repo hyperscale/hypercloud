@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Hypercloud Installer</title>
+        <base href="/" />
+
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" type="image/x-icon" href="favicon.ico" />
+
+        <link href="https://unpkg.com/@clr/ui@0.11.2-patch/clr-ui.min.css" rel="stylesheet" />
+        <link href="https://unpkg.com/@clr/icons@0.11.2-patch/clr-icons.min.css" rel="stylesheet" />
+        <script src="https://unpkg.com/@clr/icons@0.11.2-patch/clr-icons.min.js"></script>
+    </head>
+    <body>
+        <div class="main-container">
+            <div class="header">
+                <div class="branding">
+                    <span class="title">Hypercloud Installer</span>
+                </div>
+            </div>
+
+            <div class="content-container">
+                <div class="content-area">
+                    <div class="row">
+
+                        <div class="col-xs-6 offset-xs-3">
+                            <div class="card">
+                                <div class="card-header">
+                                    Installation
+                                </div>
+                                <div class="card-block">
+                                    <form method="post" id="installer">
+                                        <div class="form-group">
+                                            <label for="domain">Domain of your PaaS</label>
+                                            <input type="text" id="domain" placeholder="domain.tld" pattern="^[a-z0-9][a-z0-9\-\.]+" size="45" name="domain" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="email">Email for Let's Encrypt</label>
+                                            <input type="email" id="email" placeholder="steve@domain.tld" size="45" name="email" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="registry-user">User for Registry</label>
+                                            <input type="text" id="registry-user" placeholder="steve" size="45" name="registry_user" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="registry-password">Password for Registry</label>
+                                            <input type="password" id="registry-password" size="45" name="registry_password" />
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="card-footer">
+                                    <div id="progress" class="progress loop" style="display: none;">
+                                        <progress></progress>
+                                    </div>
+                                    <button disabled id="onInstall" type="submit" form="installer" class="btn btn-primary">Install</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOMContentLoaded');
+
+            var $events = new EventSource('/installer/events');
+            var $installBtn = document.getElementById('onInstall');
+            var $installerForm = document.getElementById('installer');
+            var $domainField = document.getElementById('domain');
+            var $emailField = document.getElementById('email');
+            var $progress = document.getElementById('progress');
+
+            $installBtn.removeAttribute('disabled');
+
+            $events.addEventListener('message', (message) => {
+                var event = JSON.parse(message.data);
+
+                console.log('event', event);
+
+                if (event.type === 'install' && event.action === 'finished') {
+                    $progress.style.display = 'none';
+                    $installBtn.removeAttribute('disabled');
+
+                    //@TODO redirect to manager url
+                }
+
+                if (event.action === 'failed') {
+                    $progress.style.display = 'none';
+                    $installBtn.removeAttribute('disabled');
+
+                    //@TODO display error
+                }
+            });
+
+            $installerForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+
+                console.log('Submit form');
+
+                $installBtn.setAttribute('disabled', 'disabled');
+                $progress.style.display = 'block';
+
+                fetch('/installer', {
+                    method: 'POST',
+                    body: new FormData($installerForm),
+                }).catch(reason => {
+                    console.err(reason);
+                    //@TODO display error
+                });
+            });
+
+        });
+        </script>
+    </body>
+</html>

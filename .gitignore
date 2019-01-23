@@ -5,7 +5,7 @@ config.yml
 var/
 _v1/
 node_modules
-cmd/hyperpaas-manager/node_modules
+cmd/hypercloud-manager/node_modules
 dev/
 .coverage/
 build/

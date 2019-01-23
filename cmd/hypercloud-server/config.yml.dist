@@ -1,0 +1,9 @@
+logger:
+  level: info
+
+server:
+  http:
+    port: 8080
+
+database:
+  path: /var/lib/hypercloud
