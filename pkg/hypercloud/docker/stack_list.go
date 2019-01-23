@@ -15,7 +15,9 @@ import (
 
 const (
 	// LabelStackNamespace is the label used to track stack resources
-	LabelStackNamespace    = "com.docker.stack.namespace"
+	LabelStackNamespace = "com.docker.stack.namespace"
+
+	// LabelInternalNamespace is the label used tu track hypercloud internal resources
 	LabelInternalNamespace = "com.hypercloud.internal"
 )
 
