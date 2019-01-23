@@ -24,23 +24,26 @@ env:
     - secure: vJhMHfcbTPjKtjZwkAYvRMhUC5gvQm8vdq2OJAzYoixqjze8qJYmWyFDx07Bmow+yMvajErkzgFFQp2lbONZWUFu/fB+DDN4aKCUh9xQfeYkE2NMyeIAi5gCmqgQGZDurrGqC/coL7yvgA82Ih+DmzEbDgiQY4UA27+a5h3Dp5vRmaaPRU0YQydk8GQRYZAd7q3eZPM8EnoPW/yu25asCFSCZMunBunEYtTHTaDB44ACUiiz7+XXSe/AzVK7EpxjI3fArPQ1rihu72V+1IVxF2JC3xDBliEcTc+P55bgiZGwedYPaH3gqftbwXxhCy7anc+2TbTC06Gyi0nDxePuZZI8k2jD5INomzIbv5XtZhDURqh3g9Bj+ircbrqISWr++iN8Yq+v2zflHnQeFm8yBQuv8X5MscOfHgiKx83dVX5/3wg2jkyRDk9aYgtZPQ9CDkU5gYzsmK87xhY5uob8r3b+7169pwUBJycAunPxK/avAWjzATxVMTAD7zD+De4n3piHb/gfUVLBdLIRcXQLbop4+JTw4CWofNDLuIJieZo6msuAGADnRSQNcolgon5FsGIL50Whd3TVehmYIN+AvIBNmbeSB4XpIOoY30Rl6qMTVQSc46WvKfza9p1kBq4Xu1nPYRbCR0+vPP5kfWnEbrCSUuiuzPBKzmhaukIdD9Q= #DOCKER_PASS
 
 install:
-  - go get golang.org/x/tools/cmd/cover
   - go get github.com/mattn/goveralls
-  - go get github.com/golang/dep/cmd/dep
-
-before_script:
-  - dep ensure
 
 script:
-  - make cover
+  - make coverage
 
 after_success:
-  - goveralls -coverprofile=coverage.out -service=travis-ci
-  - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+  - goveralls -coverprofile=./build/coverage.out -service=travis-ci
+
+before_deploy:
+  - docker login -u $DOCKER_USER -p $DOCKER_PASS
 
 deploy:
   - provider: script
-    script: scripts/deploy.sh $TRAVIS_TAG
+    script: scripts/deploy.sh
+    skip_cleanup: true
     on:
       tags: true
-      branch: master
+  - provider: script
+    script: scripts/deploy.sh
+    skip_cleanup: true
+    on:
+      tags: false
+      branch: develop
