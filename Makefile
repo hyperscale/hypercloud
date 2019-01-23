@@ -49,7 +49,10 @@ clean:
 generate: $(GO_FILES)
 	@go generate ./...
 
-$(BUILD_DIR)/coverage.out: $(GO_FILES)
+create-build-dir:
+	@mkdir -p $(BUILD_DIR)
+
+$(BUILD_DIR)/coverage.out: create-build-dir $(GO_FILES) go.mod go.sum
 	@go test -race  -cover -coverprofile $(BUILD_DIR)/coverage.out.tmp ./...
 	@cat $(BUILD_DIR)/coverage.out.tmp | grep -v '.pb.go' | grep -v 'mock_' > $(BUILD_DIR)/coverage.out
 	@rm $(BUILD_DIR)/coverage.out.tmp
