@@ -57,6 +57,12 @@ func NewProxy(host string, base string) (*httputil.ReverseProxy, error) {
 		}
 
 		req.Header.Set("Origin", "http://docker")
+
+		for _, key := range []string{"Access-Control-Request-Headers", "Access-Control-Request-Method"} {
+			if val := req.Header.Get(key); val != "" {
+				req.Header.Set(key, val)
+			}
+		}
 	}
 
 	transport := new(http.Transport)

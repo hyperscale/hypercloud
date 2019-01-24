@@ -9,3 +9,4 @@ cmd/hypercloud-manager/node_modules
 dev/
 .coverage/
 build/
+debug

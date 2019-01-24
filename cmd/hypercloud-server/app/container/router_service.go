@@ -39,6 +39,24 @@ func init() {
 
 		router := server.New(cfg.Server.ToConfig())
 
+		router.EnableCorsWithOptions(
+			handlers.AllowedOrigins([]string{
+				"*",
+			}),
+			handlers.AllowedHeaders([]string{
+				"Authorization",
+				"Content-Type",
+				"X-Requested-With",
+			}),
+			handlers.AllowedMethods([]string{
+				http.MethodGet,
+				http.MethodPost,
+				http.MethodPut,
+				http.MethodDelete,
+				http.MethodOptions,
+			}),
+		)
+
 		router.Use(hlog.NewHandler(logger))
 		router.Use(hlog.AccessHandler(hlogger.Handler))
 		router.Use(hlog.RemoteAddrHandler("ip"))
@@ -46,16 +64,6 @@ func init() {
 		router.Use(hlog.RefererHandler("referer"))
 		router.Use(hlog.RequestIDHandler("req_id", "Request-Id"))
 
-		router.EnableCorsWithOptions(handlers.AllowedHeaders([]string{
-			"Authorization",
-			"Content-Type",
-			"X-Requested-With",
-		}), handlers.AllowedMethods([]string{
-			http.MethodGet,
-			http.MethodPost,
-			http.MethodDelete,
-			http.MethodOptions,
-		}))
 		router.EnableHealthCheck()
 		router.EnableRecovery()
 
