@@ -55,7 +55,7 @@ func init() {
 				"Content-Type",
 				"X-Requested-With",
 			},
-			Debug: true,
+			Debug: false,
 		})
 
 		router.Use(hlog.NewHandler(logger))
