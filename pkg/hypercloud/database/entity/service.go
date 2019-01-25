@@ -34,7 +34,7 @@ type Service struct {
 }
 
 // swagger:response Service
-//nolint:deadcode
+//nolint
 type serviceResponseDoc struct {
 	// in: body
 	Body Service

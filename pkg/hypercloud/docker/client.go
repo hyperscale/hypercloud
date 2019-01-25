@@ -13,7 +13,8 @@ type Client struct {
 
 // NewEnvClient initializes a new API client based on environment variables.
 func NewEnvClient() (*Client, error) {
-	dc, err := client.NewEnvClient()
+	dc, err := client.NewClientWithOpts(client.FromEnv)
+	//dc, err := client.NewEnvClient()
 	if err != nil {
 		return nil, err
 	}

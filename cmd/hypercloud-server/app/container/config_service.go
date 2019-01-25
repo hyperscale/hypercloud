@@ -47,7 +47,7 @@ func init() {
 		options.SetDefault("server.metrics", true)
 		options.SetDefault("server.healthcheck", true)
 		options.SetDefault("server.shutdown_timeout", 10*time.Second)
-		options.SetDefault("server.write_timeout", 10*time.Second)
+		options.SetDefault("server.write_timeout", 0)
 		options.SetDefault("server.read_timeout", 10*time.Second)
 		options.SetDefault("server.read_header_timeout", 10*time.Millisecond)
 		options.SetDefault("database.path", "/var/lib/hypercloud")

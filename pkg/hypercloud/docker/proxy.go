@@ -66,7 +66,9 @@ func NewProxy(host string, base string) (*httputil.ReverseProxy, error) {
 	}
 
 	transport := new(http.Transport)
-	sockets.ConfigureTransport(transport, sock.Scheme, sock.Path)
+	if err := sockets.ConfigureTransport(transport, sock.Scheme, sock.Path); err != nil {
+		return nil, err
+	}
 
 	return &httputil.ReverseProxy{
 		Director:  director,

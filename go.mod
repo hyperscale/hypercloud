@@ -35,7 +35,7 @@ require (
 	github.com/docker/libtrust v0.0.0-20160708172513-aabc10ec26b7 // indirect
 	github.com/docker/swarmkit v0.0.0-20181213083726-0503e17893a2 // indirect
 	github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5 // indirect
-	github.com/euskadi31/go-server v0.0.0-20181211130237-b238dc4b7d47
+	github.com/euskadi31/go-server v0.0.0-20181211130237-b552f3ddc8a4
 	github.com/euskadi31/go-service v1.3.0
 	github.com/euskadi31/go-sse v1.0.0
 	github.com/euskadi31/go-std v2.0.0-beta.1+incompatible
@@ -48,7 +48,7 @@ require (
 	github.com/google/certificate-transparency-go v1.0.21 // indirect
 	github.com/google/gofuzz v0.0.0-20170612174753-24818f796faf // indirect
 	github.com/googleapis/gnostic v0.2.0 // indirect
-	github.com/gorilla/handlers v1.3.0
+	github.com/gorilla/handlers v1.4.0
 	github.com/gorilla/mux v1.6.2
 	github.com/gorilla/schema v0.0.0-20171228183507-afe77393c53b
 	github.com/gregjones/httpcache v0.0.0-20181110185634-c63ab54fda8f // indirect
@@ -72,7 +72,7 @@ require (
 	github.com/opencontainers/runc v0.1.1 // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pkg/errors v0.8.0
-	github.com/prometheus/client_golang v0.9.2 // indirect
+	github.com/rs/cors v1.6.0
 	github.com/rs/xid v1.2.1 // indirect
 	github.com/rs/zerolog v1.11.0
 	github.com/sirupsen/logrus v1.3.0 // indirect

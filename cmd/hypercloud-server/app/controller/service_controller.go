@@ -5,6 +5,7 @@
 package controller
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -26,6 +27,7 @@ import (
 	"github.com/hyperscale/hypercloud/pkg/hypercloud/docker"
 	"github.com/hyperscale/hypercloud/pkg/hypercloud/http/request"
 	"github.com/hyperscale/hypercloud/pkg/hypercloud/http/response"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
 
@@ -352,9 +354,13 @@ func (c ServiceController) getServiceStatsHandler(rw sse.ResponseWriter, r *http
 				if err := decoder.Decode(&stats); err == io.EOF {
 					break
 				} else if err != nil {
+					if errors.Cause(err) == context.Canceled {
+						return
+					}
+
 					log.Error().Err(err).Msg("JSON Decoder")
 
-					return
+					continue
 				}
 
 				events <- stats

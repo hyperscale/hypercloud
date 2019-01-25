@@ -21,13 +21,17 @@ func init() {
 		validator := request.NewValidator()
 
 		if schema, err := asset.Asset("schema/service.json"); err == nil {
-			validator.AddSchemaFromJSON("service", schema)
+			if err := validator.AddSchemaFromJSON("service", schema); err != nil {
+				log.Fatal().Err(err).Msg("alidator.AddSchemaFromJSON")
+			}
 		} else {
 			log.Fatal().Err(err).Msg("Asset: schema/service.json")
 		}
 
 		if schema, err := asset.Asset("schema/stack.json"); err == nil {
-			validator.AddSchemaFromJSON("stack", schema)
+			if err := validator.AddSchemaFromJSON("stack", schema); err != nil {
+				log.Fatal().Err(err).Msg("alidator.AddSchemaFromJSON")
+			}
 		} else {
 			log.Fatal().Err(err).Msg("Asset: schema/stack.json")
 		}

@@ -1,7 +1,7 @@
 version: "3.4"
 services:
   traefik_init:
-    image: traefik:1.5
+    image: traefik:1.7
     command:
       - "storeconfig"
       - "--api"
@@ -10,8 +10,7 @@ services:
       - "--entryPoints=Name:https Address::443 TLS"
       - "--acme"
       - "--acme.entryPoint=https"
-      - "--acme.httpChallenge"
-      - "--acme.httpChallenge.entryPoint=http"
+      - "--acme.tlsChallenge"
       - "--acme.email=$EMAIL"
       - "--acme.storage=traefik/acme/account"
       - "--acme.OnHostRule=true"
@@ -36,7 +35,7 @@ services:
       - consul
 
   traefik:
-    image: traefik:1.5
+    image: traefik:1.7
     depends_on:
       - traefik_init
       - consul

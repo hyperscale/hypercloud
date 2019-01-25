@@ -39,7 +39,7 @@ func (c *Client) StackList(ctx context.Context) ([]Stack, error) {
 		return nil, err
 	}
 
-	m := make(map[string]Stack, 0)
+	m := make(map[string]Stack)
 	for _, service := range services {
 		labels := service.Spec.Labels
 		name, ok := labels[LabelStackNamespace]

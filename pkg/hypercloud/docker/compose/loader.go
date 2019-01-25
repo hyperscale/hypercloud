@@ -36,6 +36,7 @@ func Loader(compose []byte, envs map[string]string) (*composetypes.Config, error
 		details.Environment[key] = val
 	}
 
+	dicts := getDictsFrom(details.ConfigFiles)
 	config, err := loader.Load(details)
 	if err != nil {
 		if fpe, ok := err.(*loader.ForbiddenPropertiesError); ok {
@@ -49,15 +50,15 @@ func Loader(compose []byte, envs map[string]string) (*composetypes.Config, error
 		return nil, errors.Wrap(err, "loader.Load")
 	}
 
-	unsupportedProperties := loader.GetUnsupportedProperties(details)
+	unsupportedProperties := loader.GetUnsupportedProperties(dicts...)
 	if len(unsupportedProperties) > 0 {
 		return nil, fmt.Errorf(
-			"Ignoring unsupported options: %s\n\n",
+			"ignoring unsupported options: %s\n\n",
 			strings.Join(unsupportedProperties, ", "),
 		)
 	}
 
-	deprecatedProperties := loader.GetDeprecatedProperties(details)
+	deprecatedProperties := loader.GetDeprecatedProperties(dicts...)
 	if len(deprecatedProperties) > 0 {
 		return nil, fmt.Errorf(
 			"Ignoring deprecated options:\n\n%s\n\n",
@@ -66,6 +67,16 @@ func Loader(compose []byte, envs map[string]string) (*composetypes.Config, error
 	}
 
 	return config, nil
+}
+
+func getDictsFrom(configFiles []composetypes.ConfigFile) []map[string]interface{} {
+	dicts := []map[string]interface{}{}
+
+	for _, configFile := range configFiles {
+		dicts = append(dicts, configFile.Config)
+	}
+
+	return dicts
 }
 
 func buildEnvironment(env []string) (map[string]string, error) {

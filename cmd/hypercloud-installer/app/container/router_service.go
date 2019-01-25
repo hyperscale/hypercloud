@@ -16,6 +16,7 @@ import (
 	hlogger "github.com/hyperscale/hypercloud/pkg/hypercloud/logger"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/hlog"
+	"github.com/rs/zerolog/log"
 )
 
 // Services keys
@@ -52,7 +53,9 @@ func init() {
 			})
 		})
 
-		router.AddHealthCheck("docker", docker.NewHealthCheck(dockerClient))
+		if err := router.AddHealthCheck("docker", docker.NewHealthCheck(dockerClient)); err != nil {
+			log.Fatal().Err(err).Msg("router.AddHealthCheck")
+		}
 
 		router.AddController(uiController)
 		router.AddController(installerController)

@@ -69,11 +69,8 @@ func (c *VersionController) worker() {
 
 	go c.fetcher()
 
-	for {
-		select {
-		case <-tickChan:
-			c.fetcher()
-		}
+	for range tickChan {
+		c.fetcher()
 	}
 }
 
