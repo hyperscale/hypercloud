@@ -1,18 +1,16 @@
 language: go
 
 sudo: required
-dist: trusty
+dist: xenial
 
 go:
-  - 1.9.x
-  - 1.10.x
+  - 1.11.x
   - master
   - tip
 
 matrix:
   fast_finish: true
   allow_failures:
-    - go: 1.9.x
     - go: master
     - go: tip
 
@@ -20,29 +18,32 @@ cache: apt
 
 env:
   global:
-    - COMMIT=${TRAVIS_COMMIT::8}
+    - GO111MODULE=on
     - secure: LYrCjqJMbDWJ36C/gMO9yaTIZMnl7dKSJRcbUGT9JO/428bCpgG+iQMGmzQF9ur/VB27/lPA9swYrB5nuA0cPpXzBfhZH+1FhAxmQl2W+3vyRZPmkr+/lSKFCeBqqWI2recN5hHSsRTNBsd5lcWL6swll+pHyoTxT7l/pT8qE0ulBHLjNqXbPCuYlQgLPtITHUcvL6YiF4N4DZx6pCP4G67p/zVgFh/wUsIfQKE6fSQbk98V71Z4DAJ+N2l3RZy6MplD4PJOMe2IgogYYRILYFn7ce2cMkwiEywfBdwscErlJE8umt5gVl6alcfhPFO9CQ5Xf48KiuIgvWj8ZoF0d4UgS/WKmynppAJMWV7gqPC7Z0FweqNSt6nk2iaqgbkDaa0Co8vuqIRd7QDxyI1UWXW7YZ6NA0dAF7acp6PFzX74ZVaDloNrT4ymvVY4jnNeGoqqYW3cONBHbvqU6iUyOfWNw3BvhDPunJsihvpPdNrOYXvljE/nsnes9goeODB/eh9Upw7GnH14tGVdIiRYf+9xPQcEStqoCKZAJ8fIVNyzmxpteZFMU6MbNYWFcuvg67A2PSix1ZLwyWwjPCwqj021r4C8akNyqA+2laFuoM/09F0QliJO1Mzx1uEln4dikxOPAHDsnEKP5C8Z7o4uhNCQNrRDX9Q5M1bXDiUG8jM= #DOCKER_EMAIL
     - secure: ZzTRcuo/h7w1GkXNqSja8S3qPrxttHvAffFoWazViwdQF23EeR7h/xga2WkGegZ3jcnu8MbI1+3dfEs4L9jH2Fo031kPbER9ekUb7Lc2StWeueu+16JwgcEdCwfHq/znTtB+c2VhgmhUqWLVeO9/e6eIbiZFHr7rpKD1ULI1fEecmOagPC8/7mZgTZ2atsaCaijIIF17oXFUVRMw/HG4iuOoJ5ziW/QygDNnu54DhVxa1SqxG95e9d/kEsq0frmM9Q1Eo0RxFHZjpLwiAxAqaHow5UXFf78qykislMio1IKEC1lhgN5jEBsGSiusjEgeSCqaKeYajbRxNqQxYz7C2gjcVCspyXdYgUQWnYG3lmzIUSSSohwT8ALSvBxNTPkXYcihFx2cd7k5kp7CZ3feXzIh3kvjorgoEaHEr1Cefe8MkMyNhdcNdpZV4vItK1A2Ef5IyDQOx8mjPJtD1biiyl6whco7jCU0lxlZeToh0+3ocNc9DtY6gJNrMuKXZTI3SyWbDZYfcuJKzrdw0QISWXZl2FGm+B5wyqN7etQYj58jQwasoYz/PvEF9oz06aSHuFCi9Bc4YlNsH6W5zal/b7kYxCdW0xZ5dJsuW+xSNWcR032g5JhTKNaWCFqCUolKcObz3DheDXmDgGS0+HQ2Maf9wqW688JRW3n3jCOWvfw= #DOCKER_USER
     - secure: vJhMHfcbTPjKtjZwkAYvRMhUC5gvQm8vdq2OJAzYoixqjze8qJYmWyFDx07Bmow+yMvajErkzgFFQp2lbONZWUFu/fB+DDN4aKCUh9xQfeYkE2NMyeIAi5gCmqgQGZDurrGqC/coL7yvgA82Ih+DmzEbDgiQY4UA27+a5h3Dp5vRmaaPRU0YQydk8GQRYZAd7q3eZPM8EnoPW/yu25asCFSCZMunBunEYtTHTaDB44ACUiiz7+XXSe/AzVK7EpxjI3fArPQ1rihu72V+1IVxF2JC3xDBliEcTc+P55bgiZGwedYPaH3gqftbwXxhCy7anc+2TbTC06Gyi0nDxePuZZI8k2jD5INomzIbv5XtZhDURqh3g9Bj+ircbrqISWr++iN8Yq+v2zflHnQeFm8yBQuv8X5MscOfHgiKx83dVX5/3wg2jkyRDk9aYgtZPQ9CDkU5gYzsmK87xhY5uob8r3b+7169pwUBJycAunPxK/avAWjzATxVMTAD7zD+De4n3piHb/gfUVLBdLIRcXQLbop4+JTw4CWofNDLuIJieZo6msuAGADnRSQNcolgon5FsGIL50Whd3TVehmYIN+AvIBNmbeSB4XpIOoY30Rl6qMTVQSc46WvKfza9p1kBq4Xu1nPYRbCR0+vPP5kfWnEbrCSUuiuzPBKzmhaukIdD9Q= #DOCKER_PASS
 
 install:
-  - go get golang.org/x/tools/cmd/cover
   - go get github.com/mattn/goveralls
-  - go get github.com/golang/dep/cmd/dep
-
-before_script:
-  - dep ensure
 
 script:
-  - make cover
+  - make coverage
 
 after_success:
-  - goveralls -coverprofile=coverage.out -service=travis-ci
-  - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+  - goveralls -coverprofile=./build/coverage.out -service=travis-ci
+
+before_deploy:
+  - docker login -u $DOCKER_USER -p $DOCKER_PASS
 
 deploy:
   - provider: script
-    script: scripts/deploy.sh $TRAVIS_TAG
+    script: scripts/deploy.sh
+    skip_cleanup: true
     on:
       tags: true
-      branch: master
+  - provider: script
+    script: scripts/deploy.sh
+    skip_cleanup: true
+    on:
+      tags: false
+      branch: develop

@@ -1,0 +1,168 @@
+version: "3.4"
+services:
+  traefik_init:
+    image: traefik:1.7
+    command:
+      - "storeconfig"
+      - "--api"
+      - "--defaultentrypoints=http,https"
+      - "--entryPoints=Name:http Address::80"
+      - "--entryPoints=Name:https Address::443 TLS"
+      - "--acme"
+      - "--acme.entryPoint=https"
+      - "--acme.tlsChallenge"
+      - "--acme.email=$EMAIL"
+      - "--acme.storage=traefik/acme/account"
+      - "--acme.OnHostRule=true"
+      - "--acme.onDemand=false"
+      - "--docker"
+      - "--docker.swarmmode"
+      - "--docker.exposedbydefault=true"
+      - "--docker.domain=$DOMAIN"
+      - "--docker.watch"
+      - "--logLevel=DEBUG"
+      - "--consul"
+      - "--consul.endpoint=consul:8500"
+      - "--consul.prefix=traefik"
+    networks:
+      - hypercloud
+    deploy:
+      labels:
+        com.hypercloud.internal: 'true'
+      restart_policy:
+        condition: on-failure
+    depends_on:
+      - consul
+
+  traefik:
+    image: traefik:1.7
+    depends_on:
+      - traefik_init
+      - consul
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+    ports:
+      - target: 80
+        published: 80
+        mode: host
+      - target: 443
+        published: 443
+        mode: host
+    command:
+      - "--consul"
+      - "--consul.endpoint=consul:8500"
+      - "--consul.prefix=traefik"
+      - "--acme.storage=traefik/acme/account"
+    networks:
+      - hypercloud
+    deploy:
+      mode: global
+      labels:
+        com.hypercloud.internal: 'true'
+      resources:
+        limits:
+          memory: 100M
+        reservations:
+          memory: 50M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 20
+        window: 380s
+      placement:
+        constraints:
+          - 'node.role == manager'
+      update_config:
+        parallelism: 1
+        delay: 10s
+
+  consul:
+    image: consul
+    command: agent -server -bootstrap-expect=1
+    volumes:
+      - consul-data:/consul/data
+    environment:
+      - CONSUL_LOCAL_CONFIG={"skip_leave_on_interrupt":true,"server":true}
+      - CONSUL_BIND_INTERFACE=eth0
+      - CONSUL_CLIENT_INTERFACE=eth0
+    deploy:
+      replicas: 1
+      labels:
+        com.hypercloud.internal: 'true'
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 1
+        delay: 10s
+      resources:
+        limits:
+          memory: 100M
+        reservations:
+          memory: 50M
+    networks:
+      - hypercloud
+
+  registry:
+    image: registry:2
+    volumes:
+      - registry-data:/var/lib/registry
+    environment:
+      - REGISTRY_AUTH="htpasswd"
+      - REGISTRY_AUTH_HTPASSWD_PATH="/run/secrets/index.$DOMAIN.htpasswd"
+      - REGISTRY_AUTH_HTPASSWD_REALM="Registry Realm"
+      - REGISTRY_STORAGE="filesystem"
+      - REGISTRY_LOG_LEVEL="debug"
+    deploy:
+      replicas: 1
+      labels:
+        com.hypercloud.internal: 'true'
+        traefik.port: '5000'
+        traefik.frontend.entryPoints: 'https'
+        traefik.frontend.rule: 'Host:index.$DOMAIN'
+        traefik.enable: 'true'
+        traefik.docker.network: 'hypercloud'
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 1
+        delay: 10s
+      resources:
+        limits:
+          memory: 100M
+        reservations:
+          memory: 50M
+    secrets:
+      - registry.htpasswd
+    networks:
+      - hypercloud
+
+networks:
+  hypercloud:
+    driver: overlay
+    attachable: true
+    labels:
+      com.hypercloud.internal: 'true'
+
+volumes:
+  consul-data:
+      driver: local
+      labels:
+        com.hypercloud.internal: 'true'
+  registry-data:
+      driver: local
+      labels:
+        com.hypercloud.internal: 'true'
+
+secrets:
+  registry.htpasswd:
+    labels:
+      com.hypercloud.internal: 'true'
+    file: ./var/lib/hypercloud/secrets/registry.htpasswd

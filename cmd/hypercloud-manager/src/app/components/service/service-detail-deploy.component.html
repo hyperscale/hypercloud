@@ -1,0 +1,114 @@
+<section class="section-info">
+    <div class="clr-row">
+        <div class="clr-col-sm-2">
+            <h4>Deployment method</h4>
+        </div>
+        <div class="clr-col-sm-9 clr-offset-sm-1">
+
+            <div class="clr-row">
+                <div class="clr-col-xs-3 deploy-card-col">
+                    <button (click)="deploy_method = 'github'" class="card clickable" [ngClass]="{'active': deploy_method == 'github'}">
+                        <div class="card-block">
+                            <div class="card-media-block">
+                                <img src="/assets/icons/github.svg" class="card-media-image" alt="" />
+                                <div class="card-media-description">
+                                    <span class="card-media-title">
+                                        Github
+                                    </span>
+                                    <span class="card-media-text">
+                                        Push
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+                <div class="clr-col-xs-3 deploy-card-col">
+                    <button (click)="deploy_method = 'bitbucket'" class="card clickable" [ngClass]="{'active': deploy_method == 'bitbucket'}">
+                        <div class="card-block">
+                            <div class="card-media-block">
+                                <img  src="/assets/icons/bitbucket.svg" class="card-media-image" alt="" />
+                                <div class="card-media-description">
+                                    <span class="card-media-title">
+                                        Bitbucket
+                                    </span>
+                                    <span class="card-media-text">
+                                        Push
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+                <div class="clr-col-xs-3 deploy-card-col">
+                    <button (click)="deploy_method = 'docker'" class="card clickable" [ngClass]="{'active': deploy_method == 'docker'}">
+                        <div class="card-block">
+                            <div class="card-media-block">
+                                <img src="/assets/icons/docker_mono.svg" class="card-media-image" alt="" />
+                                <div class="card-media-description">
+                                    <span class="card-media-title">
+                                        Docker
+                                    </span>
+                                    <span class="card-media-text">
+                                        Image
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+                <div class="clr-col-xs-3 deploy-card-col">
+                    <button (click)="deploy_method = 'git'" class="card clickable" [ngClass]="{'active': deploy_method == 'git'}">
+                        <div class="card-block">
+                            <div class="card-media-block">
+                                <img src="/assets/icons/git.svg" class="card-media-image" alt="" />
+                                <div class="card-media-description">
+                                    <span class="card-media-title">
+                                        Git
+                                    </span>
+                                    <span class="card-media-text">
+                                        Push
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section class="section-info" *ngIf="deploy_method != undefined">
+    <div class="clr-row" *ngIf="deploy_method == 'docker'">
+        <div class="clr-col-sm-2">
+            <h4>Deploy docker image</h4>
+        </div>
+        <div class="clr-col-sm-9 clr-offset-sm-1">
+
+            <form #dockerForm="ngForm" (ngSubmit)="onDeployDockerSubmit()">
+                <section class="form-block">
+                    <div class="form-group">
+                        <label for="dockerImageRef">Docker Image</label>
+                        <label for="dockerImageRef" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md" [class.invalid]="dockerImageRefInput.invalid && (dockerImageRefInput.dirty || dockerImageRefInput.touched)">
+                            <input id="dockerImageRef" placeholder="vendor/image:tag" type="text"
+                                size="34"
+                                pattern="^([a-z0-9\.\-]+(\:\d+)?\/)?([a-z0-9]{4,30}(\/)?)([a-z0-9]+)(\:[a-z0-9\.\-]+)?$"
+                                required
+                                name="dockerImageRef"
+                                [(ngModel)]="docker.image"
+                                #dockerImageRefInput="ngModel" />
+                            <span class="tooltip-content">
+                                <ng-container *ngIf="dockerImageRefInput.errors?.required">Docker Image is Required.</ng-container>
+                                <ng-container *ngIf="dockerImageRefInput.errors?.pattern">This is not valid Docker Image Reference.</ng-container>
+                            </span>
+                        </label>
+                    </div>
+                </section>
+                <button type="submit" class="btn btn-primary" [disabled]="!dockerForm.form.valid">Save</button>
+            </form>
+
+        </div>
+    </div>
+</section>

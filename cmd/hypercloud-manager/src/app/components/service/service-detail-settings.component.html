@@ -1,0 +1,142 @@
+<section class="section-config">
+        <div class="clr-row">
+            <div class="clr-col-sm-4">
+                <h4>Config Variables</h4>
+                <p>Config vars change the way your app behaves. In addition to creating your own, some add-ons come with their own.</p>
+            </div>
+            <div class="clr-col-sm-7 clr-offset-sm-1">
+                <table class="table table-noborder">
+                    <tbody>
+                        <tr *ngFor="let env of envs">
+                            <td class="left">
+                                <div class="form-group">
+                                    <input disabled type="text" value="{{ env.key }}" />
+                                </div>
+                            </td>
+                            <td class="left">
+                                <div class="form-group">
+                                    <input disabled type="text" value="{{ env.value }}" />
+                                </div>
+                            </td>
+                            <td class="left">
+                                <button type="button" class="btn btn-sm btn-link btn-icon">
+                                    <clr-icon shape="pencil"></clr-icon>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-icon btn-link text-danger">
+                                    <clr-icon shape="times"></clr-icon>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="left">
+                                <div class="form-group">
+                                    <input type="text" value="" name="env_key" placeholder="KEY" />
+                                </div>
+                            </td>
+                            <td class="left">
+                                <div class="form-group">
+                                    <input type="text" value="" name="env_value" placeholder="VALUE" />
+                                </div>
+                            </td>
+                            <td class="left">
+                                <button type="button" class="btn btn-sm btn-primary">Add</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+<section class="section-info">
+    <div class="clr-row">
+        <div class="clr-col-sm-4">
+            <h4>Placements</h4>
+        </div>
+        <div class="clr-col-sm-7 clr-offset-sm-1">
+            <table class="table table-vertical" *ngIf="service?.Spec.TaskTemplate?.Placement">
+                <tbody>
+                    <tr *ngIf="service?.Spec.TaskTemplate?.Placement?.Platforms">
+                        <th class="left">OS / Architectures</th>
+                        <td class="left">
+                            <span class="label" *ngFor="let item of service?.Spec.TaskTemplate.Placement?.Platforms">{{ item.OS }} / {{ item.Architecture }}</span>
+                        </td>
+                    </tr>
+
+                    <tr *ngIf="service?.Spec.TaskTemplate?.Placement?.Constraints">
+                        <th class="left">Constraints</th>
+                        <td class="left">
+                            <span class="label" *ngFor="let item of service?.Spec.TaskTemplate.Placement?.Constraints">{{ item }}</span>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<section class="section-resource">
+    <div class="clr-row">
+        <div class="clr-col-sm-4">
+            <h4>Resources</h4>
+        </div>
+        <div class="clr-col-sm-7 clr-offset-sm-1">
+            <table class="table table-vertical table-hybride">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th class="left">CPU</th>
+                        <th>Memory</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngIf="service?.Spec.TaskTemplate.Resources?.Reservations">
+                        <th class="left">Reserved</th>
+                        <td class="left">{{ service?.Spec.TaskTemplate.Resources?.Reservations.NanoCPUs / 1000000000 }}%</td>
+                        <td class="left">{{ service?.Spec.TaskTemplate.Resources?.Reservations.MemoryBytes | size }}</td>
+                    </tr>
+                    <tr *ngIf="service?.Spec.TaskTemplate.Resources?.Limits">
+                        <th class="left">Limited</th>
+                        <td class="left">{{ service?.Spec.TaskTemplate.Resources?.Limits.NanoCPUs / 1000000000 }}%</td>
+                        <td class="left">{{ service?.Spec.TaskTemplate.Resources?.Limits.MemoryBytes | size }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+
+<section class="section-domain">
+    <div class="clr-row">
+        <div class="clr-col-sm-4">
+            <h4>Domains</h4>
+        </div>
+        <div class="clr-col-sm-7 clr-offset-sm-1">
+            <button type="button" class="btn btn-sm btn-primary">Add domain</button>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="left">Domain Name</th>
+                        <th class="left">DNS Target</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let host of hosts">
+                        <td class="left">{{ host }}</td>
+                        <td class="left"><code class="clr-code">3600 A 195.154.67.168</code></td>
+                        <td><a href="#" class="text-danger"><clr-icon shape="times"></clr-icon></a></td>
+                    </tr>
+                    <tr *ngIf="hosts.length == 0">
+                        <td colspan="3">
+                            <h5>Custom domains will appear here</h5>
+                            <p>Custom domains allow you to access your app via one or more domain names (for example, <code>www.yourcustomdomain.com</code>)</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
