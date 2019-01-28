@@ -5,6 +5,7 @@ ARG VERSION
 ARG VCS_URL
 ARG VCS_REF
 ARG BUILD_DATE
+ENV GO111MODULE on
 RUN echo http://mirror.yandex.ru/mirrors/alpine/v3.8/main > /etc/apk/repositories; \
     echo http://mirror.yandex.ru/mirrors/alpine/v3.8/community >> /etc/apk/repositories
 RUN echo "ipv6" >> /etc/modules
