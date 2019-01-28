@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { Stack } from '../entities/docker';
 import { ApiService } from './api.service';
 
@@ -7,16 +7,11 @@ import { ApiService } from './api.service';
 export class StackService {
     constructor(private apiService: ApiService) {}
 
-    public getStacks(): Promise<Stack[]> {
-        return this.apiService.get('/v1/stacks')
-            .then(response => response.json())
-            .then(response => {
-                return response.map(stack => stack as Stack);
-            });
+    public getStacks(): Observable<Stack[]> {
+        return this.apiService.get<Stack[]>('/v1/stacks');
     }
 
-    public create(stack: Stack): Promise<Stack> {
-        return this.apiService.post('/v1/stacks', stack)
-            .then(response => response.json() as Stack);
+    public create(stack: Stack): Observable<Stack> {
+        return this.apiService.post<Stack>('/v1/stacks', stack);
     }
 }

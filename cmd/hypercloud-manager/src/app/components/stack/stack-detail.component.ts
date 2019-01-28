@@ -33,6 +33,6 @@ export class StackDetailComponent implements OnInit {
     private fetchServices(id: string) {
         this.serviceService.getServices({
             stack_id: id
-        }).then(services => this.services = services);
+        }).subscribe(services => this.services = services);
     }
 }

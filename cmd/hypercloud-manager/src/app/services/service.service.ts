@@ -1,7 +1,6 @@
 import { NgZone, Injectable } from '@angular/core';
-import { URLSearchParams } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
+import { HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { Service, StatsJSON, ServiceRequest } from '../entities';
 import { ApiService } from './api.service';
 
@@ -16,13 +15,12 @@ export class ServiceService {
     constructor(private apiService: ApiService, private ngZone: NgZone) {
     }
 
-    public getService(id: string): Promise<Service> {
-        return this.apiService.get(`/v1/services/${id}`)
-        .then(response => response.json() as Service);
+    public getService(id: string): Observable<Service> {
+        return this.apiService.get<Service>(`/v1/services/${id}`);
     }
 
-    public getServices(query?: ServicesQueryParams): Promise<Service[]> {
-        const params: URLSearchParams = new URLSearchParams();
+    public getServices(query?: ServicesQueryParams): Observable<Service[]> {
+        const params = new HttpParams();
 
         if (query) {
             Object.keys(query).map((key) =>  {
@@ -32,32 +30,26 @@ export class ServiceService {
 
         let url = '/v1/services';
 
-        if (params.paramsMap.size > 0) {
+        if (params.keys().length > 0) {
             url += '?' + params.toString();
         }
 
-        return this.apiService.get(url)
-            .then(response => response.json())
-            .then(response => {
-                return response.map(service => service as Service);
-            });
+        return this.apiService.get<Service[]>(url);
     }
 
-    public create(service: ServiceRequest): Promise<Service> {
-        return this.apiService.post('/v1/services', service)
-            .then(response => response.json() as Service);
+    public create(service: ServiceRequest): Observable<Service> {
+        return this.apiService.post<Service>('/v1/services', service);
     }
 
-    public update(id: string, service: Service): Promise<Service> {
-        return this.apiService.put(`/v1/services/${id}`, service)
-            .then(response => response.json() as Service);
+    public update(id: string, service: Service): Observable<Service> {
+        return this.apiService.put<Service>(`/v1/services/${id}`, service);
     }
 
     public stats(id: string): Observable<StatsJSON> {
         return new Observable<StatsJSON>(obs => {
             const eventSource = new this.eventSource(this.apiService.getUrl(`/v1/services/${id}/stats`));
 
-            eventSource.onmessage = event => {
+            eventSource.onmessage = (event) => {
                 const data = JSON.parse(event.data) as StatsJSON;
 
                 this.ngZone.run(() => obs.next(data));

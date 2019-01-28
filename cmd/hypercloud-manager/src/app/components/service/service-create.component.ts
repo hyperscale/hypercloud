@@ -32,7 +32,7 @@ export class ServiceCreateComponent implements OnInit, OnDestroy {
 
             this.service.stack_id = params['stack_id'] || '';
 
-            this.stackService.getStacks().then(stacks => this.stacks = stacks);
+            this.stackService.getStacks().subscribe(stacks => this.stacks = stacks);
         });
     }
 
@@ -53,7 +53,7 @@ export class ServiceCreateComponent implements OnInit, OnDestroy {
 
         console.log('Service Request:', this.service);
 
-        this.serviceService.create(this.service).then(service => {
+        this.serviceService.create(this.service).subscribe(service => {
             console.log('Service Response', service);
 
             this.onReset();

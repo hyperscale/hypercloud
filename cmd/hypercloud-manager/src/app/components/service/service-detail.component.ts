@@ -22,7 +22,9 @@ export class ServiceDetailComponent implements OnInit {
         this.activatedRoute.params.subscribe((params: Params) => {
             console.log('ID:', params['id']);
 
-            this.fetchService(params['id']).then(service => {
+            this.fetchService(params['id']).subscribe(service => {
+                this.service = service;
+
                 this.stack = {
                     Name: service.Spec.Labels['com.docker.stack.namespace'],
                 };
@@ -31,6 +33,6 @@ export class ServiceDetailComponent implements OnInit {
     }
 
     private fetchService(id: string) {
-        return this.serviceService.getService(id).then(service => this.service = service);
+        return this.serviceService.getService(id);
     }
 }

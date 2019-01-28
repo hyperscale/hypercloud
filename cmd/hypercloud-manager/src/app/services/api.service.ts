@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Http, Headers, RequestOptionsArgs, Response } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/toPromise';
+import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError, of } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
 
 import { environment } from '../../environments/environment';
 
@@ -15,6 +15,17 @@ const serialize = (obj: any) => {
 
     return str.join('&');
 };
+
+export interface RequestOptions {
+    headers?: HttpHeaders;
+    observe?: 'body';
+    params?: HttpParams | {
+        [param: string]: string | string[];
+    };
+    reportProgress?: boolean;
+    responseType?: 'json';
+    withCredentials?: boolean;
+}
 
 export interface OAuthToken {
     access_token: string;
@@ -33,7 +44,7 @@ export class ApiService {
 
     private timeoutId: number;
 
-    constructor(private http: Http) {
+    constructor(private http: HttpClient) {
     }
 
     getToken(): OAuthToken {
@@ -89,28 +100,45 @@ export class ApiService {
         return false;
     }
 
-    refreshToken(): Promise<OAuthToken> {
+    private handleError(error: HttpErrorResponse) {
+        if (error.error instanceof ErrorEvent) {
+          // A client-side or network error occurred. Handle it accordingly.
+          console.error('An error occurred:', error.error.message);
+        } else {
+          // The backend returned an unsuccessful response code.
+          // The response body may contain clues as to what went wrong,
+          console.error(
+            `Backend returned code ${error.status}, ` +
+            `body was: ${error.error}`);
+        }
+
+        // return an observable with a user-facing error message
+        return throwError('Something bad happened; please try again later.');
+    }
+
+    refreshToken(): Observable<OAuthToken> {
         const token = this.getToken();
 
-        return this.post('/v1/oauth/token', {
+        return this.post<OAuthToken>('/v1/oauth/token', {
             grant_type: 'refresh_token',
             refresh_token: token.refresh_token
         }, {
-            headers: new Headers({
+            headers: new HttpHeaders({
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'Authorization': this.getAuthorizationBasic()
             }),
-        }).then((response) => {
-            const tok = response.json() as OAuthToken;
+        }).pipe(
+            catchError((error: HttpErrorResponse) => {
+                this.removeToken();
 
-            this.setToken(tok);
+                return this.handleError(error);
+            }),
+            switchMap(response => {
+                this.setToken(response);
 
-            return tok;
-        }).catch((reason) => {
-            this.removeToken();
-
-            return reason;
-        });
+                return of(response);
+            })
+        );
     }
 
     getAuthorizationBasic(): string {
@@ -129,8 +157,8 @@ export class ApiService {
         return this.getAuthorizationBasic();
     }
 
-    getOptions(options?: RequestOptionsArgs): RequestOptionsArgs {
-        const headers = new Headers({
+    getOptions(options?: RequestOptions): RequestOptions {
+        const headers = new HttpHeaders({
             'Content-Type': 'application/json',
             'Authorization': this.getAuthorization()
         });
@@ -140,21 +168,23 @@ export class ApiService {
         }
 
         if (options.headers) {
-            headers.forEach((values, name) => {
-                if (!options.headers.has(name)) {
-                    options.headers.set(name, values);
+            headers.keys().forEach((key) => {
+                if (!options.headers.has(key)) {
+                    options.headers.set(key, headers.getAll(key));
                 }
             });
         } else {
             options.headers = headers;
         }
 
-        options.headers.forEach((values, name) => {
-            values.forEach(val => {
+        options.headers.keys().forEach((key) => {
+            options.headers.getAll(key).forEach((val) => {
                 if ((<any>val) === false) {
-                    options.headers.delete(name);
+                    options.headers.delete(key);
                 }
             });
+
+
         });
 
         return options;
@@ -168,7 +198,7 @@ export class ApiService {
         return `${this.base}/${path}`;
     }
 
-    processBody(body: any, options: RequestOptionsArgs): any {
+    processBody(body: any, options: RequestOptions): any {
         if (options.headers.get('Content-Type') === 'application/x-www-form-urlencoded') {
             return serialize(body);
         }
@@ -179,60 +209,32 @@ export class ApiService {
     /**
      * Performs a request with `get` http method.
      */
-    get(path: string, options?: RequestOptionsArgs): Promise<Response> {
-        return this.get$(path, options).toPromise();
-    }
-
-    /**
-     * Performs a request with `get` http method.
-     */
-    get$(path: string, options?: RequestOptionsArgs): Observable<Response> {
-        return this.http.get(this.getUrl(path), this.getOptions(options));
+    get<T>(path: string, options?: RequestOptions): Observable<T> {
+        return this.http.get<T>(this.getUrl(path), this.getOptions(options));
     }
 
     /**
      * Performs a request with `post` http method.
      */
-    post(path: string, body: any, options?: RequestOptionsArgs): Promise<Response> {
-        return this.post$(path, body, options).toPromise();
-    }
-
-    /**
-     * Performs a request with `post` http method.
-     */
-    post$(path: string, body: any, options?: RequestOptionsArgs): Observable<Response> {
+    post<T>(path: string, body: any, options?: RequestOptions): Observable<T> {
         options = this.getOptions(options);
 
-        return this.http.post(this.getUrl(path), this.processBody(body, options), options);
+        return this.http.post<T>(this.getUrl(path), this.processBody(body, options), options);
     }
 
     /**
      * Performs a request with `put` http method.
      */
-    put(path: string, body: any, options?: RequestOptionsArgs): Promise<Response> {
-        return this.put$(path, body, options).toPromise();
-    }
-
-     /**
-     * Performs a request with `put` http method.
-     */
-    put$(path: string, body: any, options?: RequestOptionsArgs): Observable<Response> {
+    put<T>(path: string, body: any, options?: RequestOptions): Observable<T> {
         options = this.getOptions(options);
 
-        return this.http.put(this.getUrl(path), this.processBody(body, options), options);
+        return this.http.put<T>(this.getUrl(path), this.processBody(body, options), options);
     }
 
     /**
      * Performs a request with `delete` http method.
      */
-    delete(path: string, options?: RequestOptionsArgs): Promise<Response> {
-        return this.delete$(path, options).toPromise();
-    }
-
-    /**
-     * Performs a request with `delete` http method.
-     */
-    delete$(path: string, options?: RequestOptionsArgs): Observable<Response> {
-        return this.http.delete(this.getUrl(path), this.getOptions(options));
+    delete<T>(path: string, options?: RequestOptions): Observable<T> {
+        return this.http.delete<T>(this.getUrl(path), this.getOptions(options));
     }
 }

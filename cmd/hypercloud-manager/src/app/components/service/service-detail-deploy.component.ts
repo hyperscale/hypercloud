@@ -39,7 +39,7 @@ export class ServiceDetailDeployComponent implements OnInit {
 
         console.log('Service Request:', this.service);
 
-        this.serviceService.update(this.service.ID, this.service).then(service => {
+        this.serviceService.update(this.service.ID, this.service).subscribe(service => {
             console.log('Service Response:', service);
 
             this.route.snapshot.parent.data['service'] = service;

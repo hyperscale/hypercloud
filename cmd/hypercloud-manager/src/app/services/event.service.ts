@@ -1,8 +1,6 @@
 import { NgZone, Injectable } from '@angular/core';
-import { URLSearchParams } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
-
+import { HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { Message } from '../entities/docker';
 import { ApiService } from './api.service';
 
@@ -21,7 +19,7 @@ export class EventService {
         console.log('EventService::events()');
 
         return new Observable<Message>(obs => {
-            const params: URLSearchParams = new URLSearchParams();
+            const params = new HttpParams();
 
             if (query) {
                 Object.keys(query).map((key) =>  {
@@ -31,7 +29,7 @@ export class EventService {
 
             let url = '/v1/events';
 
-            if (params.paramsMap.size > 0) {
+            if (params.keys().length > 0) {
                 url += '?' + params.toString();
             }
 

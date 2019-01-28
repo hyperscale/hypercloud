@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Service, ServiceInfo } from '../../entities';
 import { ServiceService, DockerService } from '../../services';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-service-list-table',
@@ -25,17 +26,20 @@ export class ServiceListTableComponent implements OnInit {
         const tasksNoShutdown: { [key: string]: number } = {};
         const activeNodes: { [key: string]: boolean } = {};
 
-        this.dockerService.getNodes().then(nodes => {
-            nodes.forEach(node => {
-                if (node.Status.State !== 'down') {
-                    activeNodes[node.ID] = true;
-                }
-            });
+        this.dockerService.getNodes().pipe(
+            switchMap(nodes => {
+                nodes.forEach(node => {
+                    if (node.Status.State !== 'down') {
+                        activeNodes[node.ID] = true;
+                    }
+                });
 
-            return nodes;
-        }).then(nodes => {
-            return this.dockerService.getTasks();
-        }).then(tasks => {
+                return nodes;
+            }),
+            switchMap(nodes => {
+                return this.dockerService.getTasks();
+            })
+        ).subscribe(tasks => {
             tasks.forEach(task => {
                 if (task.DesiredState !== 'shutdown') {
                     if (!tasksNoShutdown.hasOwnProperty(task.ServiceID)) {
@@ -74,7 +78,6 @@ export class ServiceListTableComponent implements OnInit {
                 });
 
             });
-
         });
     }
 }

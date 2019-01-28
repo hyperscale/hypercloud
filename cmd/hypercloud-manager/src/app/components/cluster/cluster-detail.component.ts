@@ -35,11 +35,11 @@ export class ClusterDetailComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.dockerService.getVersion().then(version => {
+        this.dockerService.getVersion().subscribe(version => {
             this.cluster.version = version.ApiVersion;
         });
 
-        this.dockerService.getInfo().then(info => {
+        this.dockerService.getInfo().subscribe(info => {
             this.info = info;
 
             info.Swarm.RemoteManagers.forEach(item => {
@@ -49,9 +49,9 @@ export class ClusterDetailComponent implements OnInit {
             });
         });
 
-        this.dockerService.getSwarm().then(swarm => this.swarm = swarm);
+        this.dockerService.getSwarm().subscribe(swarm => this.swarm = swarm);
 
-        this.dockerService.getNodes().then(nodes => {
+        this.dockerService.getNodes().subscribe(nodes => {
             console.log(nodes);
             this.nodes = nodes;
 

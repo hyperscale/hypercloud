@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { URLSearchParams } from '@angular/http';
+import { HttpParams } from '@angular/common/http';
 import { Node, Swarm, Info, VersionResponse, Task } from '../entities/docker';
 import { ApiService } from './api.service';
 import * as _ from 'lodash';
+import { Observable } from 'rxjs';
 
 export class DockerFilterParams {
     containers: { [key: string]: string[] };
@@ -54,28 +55,28 @@ export interface TasksQueryParams {
 export class DockerService {
     constructor(private apiService: ApiService) { }
 
-    public getVersion(): Promise<VersionResponse> {
-        return this.apiService.get('/docker/version').then(response => response.json() as VersionResponse);
+    public getVersion(): Observable<VersionResponse> {
+        return this.apiService.get<VersionResponse>('/docker/version');
     }
 
-    public getInfo(): Promise<Info> {
-        return this.apiService.get('/docker/info').then(response => response.json() as Info);
+    public getInfo(): Observable<Info> {
+        return this.apiService.get<Info>('/docker/info');
     }
 
-    public getSwarm(): Promise<Swarm> {
-        return this.apiService.get('/docker/swarm').then(response => response.json() as Swarm);
+    public getSwarm(): Observable<Swarm> {
+        return this.apiService.get<Swarm>('/docker/swarm');
     }
 
-    public getNodes(): Promise<Node[]> {
-        return this.apiService.get('/docker/nodes').then(response => response.json() as Node[]);
+    public getNodes(): Observable<Node[]> {
+        return this.apiService.get<Node[]>('/docker/nodes');
     }
 
-    public getNode(id: string): Promise<Node> {
-        return this.apiService.get(`/docker/nodes/${id}`).then(response => response.json() as Node);
+    public getNode(id: string): Observable<Node> {
+        return this.apiService.get<Node>(`/docker/nodes/${id}`);
     }
 
-    public getTasks(query?: TasksQueryParams): Promise<Task[]> {
-        const params: URLSearchParams = new URLSearchParams();
+    public getTasks(query?: TasksQueryParams): Observable<Task[]> {
+        const params = new HttpParams();
 
         if (query) {
             Object.keys(query).map((key) =>  {
@@ -91,11 +92,10 @@ export class DockerService {
 
         let url = '/docker/tasks';
 
-        if (params.paramsMap.size > 0) {
+        if (params.keys().length > 0) {
             url += '?' + params.toString();
         }
 
-        return this.apiService.get(url)
-            .then(response => response.json() as Task[]);
+        return this.apiService.get<Task[]>(url);
     }
 }

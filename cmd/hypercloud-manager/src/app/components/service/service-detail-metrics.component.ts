@@ -2,8 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/
 import { ActivatedRoute } from '@angular/router';
 import { Service, StatsJSON, NetworkStats } from '../../entities';
 import { ServiceService } from '../../services';
-import { Subscription } from 'rxjs/Subscription';
-import { Subject } from 'rxjs/Subject';
+import { Subscription, Subject } from 'rxjs';
 import * as _ from 'lodash';
 
 interface StatsMemory {

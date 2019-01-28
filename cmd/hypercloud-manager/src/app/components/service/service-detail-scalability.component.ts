@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Service, Task, Node } from '../../entities';
 import { ActivatedRoute } from '@angular/router';
 import { ServiceService, DockerService, DockerFilterParams } from '../../services';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-service-detail-scalability',
@@ -40,16 +41,18 @@ export class ServiceDetailScalabilityComponent implements OnInit {
             }
         });
 
-        this.dockerService.getNodes().then(nodes => {
-            nodes.forEach(node => this.nodes[node.ID] = node);
+        this.dockerService.getNodes().pipe(
+            switchMap(nodes => {
+                nodes.forEach(node => this.nodes[node.ID] = node);
 
-            return this.dockerService.getTasks({
-                filters: new DockerFilterParams({
-                    service: this.service.Spec.Name,
-                    desired_state: ['running', 'accepted']
-                })
-            });
-        }).then(tasks => {
+                return this.dockerService.getTasks({
+                    filters: new DockerFilterParams({
+                        service: this.service.Spec.Name,
+                        desired_state: ['running', 'accepted']
+                    })
+                });
+            })
+        ).subscribe(tasks => {
             this.tasks = tasks;
         });
     }
@@ -69,7 +72,7 @@ export class ServiceDetailScalabilityComponent implements OnInit {
 
         console.log('Service Request:', this.service);
 
-        this.serviceService.update(this.service.ID, this.service).then(service => {
+        this.serviceService.update(this.service.ID, this.service).subscribe(service => {
             console.log('Service Response:', service);
 
             this.route.snapshot.parent.data['service'] = service;

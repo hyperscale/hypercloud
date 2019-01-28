@@ -24,14 +24,14 @@ export class StackListComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.stackService.getStacks().then(stacks => this.stacks = stacks);
+        this.stackService.getStacks().subscribe(stacks => this.stacks = stacks);
     }
 
     onSubmit() {
         this.submitted = true;
         console.log('Stack Request:', this.stack);
 
-        this.stackService.create(this.stack).then(stack => {
+        this.stackService.create(this.stack).subscribe(stack => {
             console.log('Stack Response:', stack);
 
             this.stacks.push(stack);

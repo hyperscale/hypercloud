@@ -9,5 +9,5 @@ import "github.com/hyperscale/hypercloud/pkg/hypercloud/http/request"
 // ServiceCreateResponse struct
 type ServiceCreateResponse struct {
 	*request.ServiceCreateRequest
-	ID string `json:"id"`
+	ID string `json:"ID"`
 }
