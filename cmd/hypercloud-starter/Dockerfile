@@ -11,6 +11,7 @@ RUN echo "ipv6" >> /etc/modules
 RUN apk upgrade --update-cache --available && \
     apk add --update --no-cache ca-certificates curl git make && \
     rm -rf /var/cache/apk/*
+RUN GO111MODULE=off CGO_ENABLED=0 go get -u github.com/go-bindata/go-bindata/...
 COPY ./ .
 RUN make build/hypercloud-starter
 
