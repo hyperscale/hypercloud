@@ -54,6 +54,7 @@ for image in $(find $PROJECT_WORKSPACE/cmd -name "Dockerfile"); do
 
     echo "Building $DOCKER_ORGANISATION/$DOCKER_REPO..."
     docker build --rm \
+        --cache-from "$DOCKER_ORGANISATION/$DOCKER_REPO:latest" \
         --build-arg "VERSION=$CI_BUILD_VERSION" \
         --build-arg "VCS_URL=$CI_BUILD_URL" \
         --build-arg "VCS_REF=$CI_BUILD_COMMIT" \

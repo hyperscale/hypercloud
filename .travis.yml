@@ -14,7 +14,10 @@ matrix:
     - go: master
     - go: tip
 
-cache: apt
+cache:
+  directories:
+    - $HOME/.cache/go-build
+    - $HOME/gopath/pkg/mod
 
 env:
   global:

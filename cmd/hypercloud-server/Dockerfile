@@ -6,13 +6,14 @@ ARG VCS_URL
 ARG VCS_REF
 ARG BUILD_DATE
 ENV GO111MODULE on
+ENV CGO_ENABLED=0
 RUN echo http://mirror.yandex.ru/mirrors/alpine/v3.8/main > /etc/apk/repositories; \
     echo http://mirror.yandex.ru/mirrors/alpine/v3.8/community >> /etc/apk/repositories
 RUN echo "ipv6" >> /etc/modules
 RUN apk upgrade --update-cache --available && \
     apk add --update --no-cache ca-certificates curl git make && \
     rm -rf /var/cache/apk/*
-RUN GO111MODULE=off CGO_ENABLED=0 go get -u github.com/go-bindata/go-bindata/...
+RUN GO111MODULE=off go get -u github.com/go-bindata/go-bindata/...
 COPY ./ .
 RUN make build/hypercloud-server
 
