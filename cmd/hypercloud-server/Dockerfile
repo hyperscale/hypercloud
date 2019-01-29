@@ -18,7 +18,7 @@ COPY ./ .
 RUN make build/hypercloud-server
 
 # Application
-FROM docker:18.09.0-ce-dind
+FROM docker:18.09-dind
 ARG VERSION
 ARG VCS_URL
 ARG VCS_REF
