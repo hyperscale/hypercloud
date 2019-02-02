@@ -5,7 +5,7 @@ set -e
 PROJECT_WORKSPACE="$(dirname $0)/.."
 PROJECT_WORKSPACE="$(cd $PROJECT_WORKSPACE; pwd)"
 
-DOCKER_ORGANISATION="hypersclae"
+DOCKER_ORGANISATION="hyperscale"
 
 LATEST="false"
 
