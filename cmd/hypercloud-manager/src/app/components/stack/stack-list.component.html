@@ -36,7 +36,7 @@
                             minlength="3"
                             pattern="^[a-z][a-z0-9_]+$"
                             name="stackName"
-                            [(ngModel)]="stack.name"
+                            [(ngModel)]="stack.Name"
                             #stackNameInput="ngModel" />
                         <span class="tooltip-content">
                             <ng-container *ngIf="stackNameInput.errors?.minlength">This name is too short (minimum is 3 characters).</ng-container>

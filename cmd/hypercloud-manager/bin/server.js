@@ -2,7 +2,7 @@ let express = require('express');
 let config = require('config');
 
 const options = {
-    root: __dirname + '/../dist/',
+    root: __dirname + '/../dist/hypercloud-manager/',
     dotfiles: 'deny',
     headers: {}
 };

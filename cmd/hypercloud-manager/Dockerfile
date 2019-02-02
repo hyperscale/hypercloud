@@ -7,9 +7,10 @@ ARG VCS_REF
 ARG BUILD_DATE
 RUN apk add --update --no-cache python python-dev
 COPY ./ .
+WORKDIR /build/cmd/hypercloud-manager
 RUN mkdir .npm-global
-RUN npm config set prefix '/build/.npm-global'
-RUN export PATH=/build/.npm-global/bin:$PATH
+RUN npm config set prefix '/build/cmd/hypercloud-manager/.npm-global'
+RUN export PATH=/build/cmd/hypercloud-manager/.npm-global/bin:$PATH
 RUN npm install
 RUN npm run build
 
@@ -24,9 +25,9 @@ ENV NODE_ENV production
 ENV NPM_CONFIG_LOGLEVEL warn
 RUN apk add --update --no-cache ca-certificates curl && rm -rf /var/cache/apk/*
 WORKDIR /opt/hypercloud-manager/
-COPY --from=manager-builder /build/bin ./bin
-COPY --from=manager-builder /build/dist ./dist
-COPY --from=manager-builder /build/config ./config
+COPY --from=manager-builder /build/cmd/hypercloud-manager/bin ./bin
+COPY --from=manager-builder /build/cmd/hypercloud-manager/dist ./dist
+COPY --from=manager-builder /build/cmd/hypercloud-manager/config ./config
 HEALTHCHECK --interval=5s --timeout=2s CMD curl -f http://localhost:${PORT}/health > /dev/null 2>&1 || exit 1
 EXPOSE ${PORT}
 CMD [ "node", "bin/server.js" ]

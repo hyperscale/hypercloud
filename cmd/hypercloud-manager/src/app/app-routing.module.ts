@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 import { DashboardComponent } from './components/dashboard/dashboard.component';
-import { CollectionComponent } from './components/collection/collection.component';
 import { ClusterDetailComponent } from './components/cluster/cluster-detail.component';
 import { ServiceListComponent } from './components/service/service-list.component';
 import { ServiceCreateComponent } from './components/service/service-create.component';

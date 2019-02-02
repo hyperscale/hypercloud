@@ -1,5 +1,11 @@
-_resources/*
-var/*
-_v1/*
-vendor/*
+_resources
+var
+_v1
+vendor
 .DS_Store
+build
+node_modules
+scripts
+dev
+.vscode
+dist

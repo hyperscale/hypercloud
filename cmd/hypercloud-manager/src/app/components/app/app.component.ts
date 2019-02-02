@@ -9,6 +9,8 @@ import { EventService } from '../../services';
 })
 export class AppComponent implements OnInit, OnDestroy {
     private subscriptions: Subscription[] = [];
+    public collapsed = false;
+    public collapsible = false;
 
     constructor(private eventService: EventService) {}
 

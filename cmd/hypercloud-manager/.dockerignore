@@ -1,1 +1,15 @@
 node_modules
+_resources
+var
+_v1
+vendor
+.DS_Store
+build
+hypercloud-installer
+hypercloud-server
+hypercloud-starter
+pkg
+scripts
+dev
+.vscode
+dist
