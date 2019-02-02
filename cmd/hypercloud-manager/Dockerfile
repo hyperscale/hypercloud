@@ -23,7 +23,7 @@ ENV PORT 8080
 ENV NODE_ENV production
 ENV NPM_CONFIG_LOGLEVEL warn
 RUN apk add --update --no-cache ca-certificates curl && rm -rf /var/cache/apk/*
-WORKDIR /opt/hyperpaas-manager/
+WORKDIR /opt/hypercloud-manager/
 COPY --from=manager-builder /build/bin ./bin
 COPY --from=manager-builder /build/dist ./dist
 COPY --from=manager-builder /build/config ./config
