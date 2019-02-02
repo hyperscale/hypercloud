@@ -85,7 +85,7 @@ func schemaServiceJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "schema/service.json", size: 339, mode: os.FileMode(420), modTime: time.Unix(1516413875, 0)}
+	info := bindataFileInfo{name: "schema/service.json", size: 339, mode: os.FileMode(420), modTime: time.Unix(1548716490, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -105,7 +105,7 @@ func schemaStackJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "schema/stack.json", size: 296, mode: os.FileMode(420), modTime: time.Unix(1516408820, 0)}
+	info := bindataFileInfo{name: "schema/stack.json", size: 296, mode: os.FileMode(420), modTime: time.Unix(1548716490, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -125,7 +125,7 @@ func docsSwaggerJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "docs/swagger.json", size: 7554, mode: os.FileMode(420), modTime: time.Unix(1548282696, 0)}
+	info := bindataFileInfo{name: "docs/swagger.json", size: 7554, mode: os.FileMode(420), modTime: time.Unix(1548716490, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
