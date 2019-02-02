@@ -44,9 +44,11 @@ deploy:
     skip_cleanup: true
     on:
       tags: true
+      condition: $TRAVIS_ALLOW_FAILURE = "false"
   - provider: script
     script: scripts/deploy.sh
     skip_cleanup: true
     on:
       tags: false
       branch: develop
+      condition: $TRAVIS_ALLOW_FAILURE = "false"
