@@ -49,7 +49,7 @@ require (
 	github.com/google/gofuzz v0.0.0-20170612174753-24818f796faf // indirect
 	github.com/googleapis/gnostic v0.2.0 // indirect
 	github.com/gorilla/handlers v1.4.2
-	github.com/gorilla/mux v1.6.2
+	github.com/gorilla/mux v1.7.3
 	github.com/gorilla/schema v0.0.0-20171228183507-afe77393c53b
 	github.com/gregjones/httpcache v0.0.0-20181110185634-c63ab54fda8f // indirect
 	github.com/hailocab/go-hostpool v0.0.0-20160125115350-e80d13ce29ed // indirect
