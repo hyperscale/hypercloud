@@ -72,7 +72,7 @@ require (
 	github.com/opencontainers/runc v0.1.1 // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pkg/errors v0.8.1
-	github.com/rs/cors v1.6.0
+	github.com/rs/cors v1.7.0
 	github.com/rs/xid v1.2.1 // indirect
 	github.com/rs/zerolog v1.11.0
 	github.com/sirupsen/logrus v1.3.0 // indirect
