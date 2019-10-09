@@ -36,7 +36,7 @@ require (
 	github.com/docker/swarmkit v0.0.0-20190117220853-0503e17893a2 // indirect
 	github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5 // indirect
 	github.com/euskadi31/go-server v0.0.0-20191009113222-686c429d32ee
-	github.com/euskadi31/go-service v1.3.0
+	github.com/euskadi31/go-service v1.3.1
 	github.com/euskadi31/go-sse v1.0.0
 	github.com/euskadi31/go-std v2.0.0-beta.1+incompatible
 	github.com/flynn-archive/go-shlex v0.0.0-20150515145356-3f9db97f8568 // indirect
