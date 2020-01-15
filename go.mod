@@ -67,7 +67,7 @@ require (
 	github.com/opencontainers/image-spec v1.0.1 // indirect
 	github.com/opencontainers/runc v0.1.1 // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
-	github.com/pkg/errors v0.9.0
+	github.com/pkg/errors v0.9.1
 	github.com/rs/cors v1.7.0
 	github.com/rs/zerolog v1.17.2
 	github.com/sirupsen/logrus v1.3.0 // indirect
