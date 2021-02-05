@@ -122,6 +122,7 @@ github.com/euskadi31/go-service v1.3.1 h1:FH5vONJ1lbuGCY3ckhbitn9DIrqAMMOFIJLlmW
 github.com/euskadi31/go-service v1.3.1/go.mod h1:Vu3PQBD/elJ44N8KupR+id09BJ2AREa8mr0Y3s6xTzM=
 github.com/euskadi31/go-service v1.3.2 h1:Z7VoQI4uk91Nyc2yuwgOTko13scxk5Zoh+Ehp7KCOVM=
 github.com/euskadi31/go-service v1.3.2/go.mod h1:f4rLyMfpQCs63oKufQa6exYPjPGrH7dL9XMJY09WajI=
+github.com/euskadi31/go-service v1.4.0/go.mod h1:Ug06GLlnDDvnMXc9+nkyitFYa6qdMHZp9vMwFUWE1uU=
 github.com/euskadi31/go-sse v1.0.0 h1:f/3cmYbYXf8yriMEmd41uoZMUbZJxA+QvPO8DQSMGHs=
 github.com/euskadi31/go-sse v1.0.0/go.mod h1:AIGWUFHKMP4dBPsgNc6AW3IHmDv3qjWRgaUaXz8z5rc=
 github.com/euskadi31/go-std v2.0.0-beta.1+incompatible h1:AahhNJrU/bgOf6LFc1UDCdgf7jtu1PTQi5msIGzvPp0=
