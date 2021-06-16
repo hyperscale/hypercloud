@@ -18,6 +18,7 @@ require (
 	github.com/cenkalti/backoff v2.1.1+incompatible // indirect
 	github.com/cloudflare/cfssl v0.0.0-20181213083726-b94e044bb51e // indirect
 	github.com/containerd/continuity v0.0.0-20181203112020-004b46473808 // indirect
+	github.com/coreos/etcd v3.3.13+incompatible // indirect
 	github.com/coreos/go-semver v0.3.0
 	github.com/denisenkom/go-mssqldb v0.0.0-20190121005146-b04fd42d9952 // indirect
 	github.com/docker/cli v0.0.0-20190121150209-01a591477c1f
@@ -42,7 +43,6 @@ require (
 	github.com/gofrs/uuid v3.2.0+incompatible // indirect
 	github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db // indirect
 	github.com/google/certificate-transparency-go v1.0.21 // indirect
-	github.com/google/gofuzz v0.0.0-20170612174753-24818f796faf // indirect
 	github.com/googleapis/gnostic v0.2.0 // indirect
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/schema v0.0.0-20171228183507-afe77393c53b
@@ -68,7 +68,7 @@ require (
 	github.com/rs/zerolog v1.23.0
 	github.com/sirupsen/logrus v1.3.0 // indirect
 	github.com/spf13/cobra v0.0.3 // indirect
-	github.com/spf13/viper v1.7.1
+	github.com/spf13/viper v1.8.0
 	github.com/stretchr/testify v1.7.0
 	github.com/theupdateframework/notary v0.6.1 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f // indirect
