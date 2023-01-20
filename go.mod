@@ -48,7 +48,6 @@ require (
 	github.com/gorilla/schema v0.0.0-20171228183507-afe77393c53b
 	github.com/gregjones/httpcache v0.0.0-20181110185634-c63ab54fda8f // indirect
 	github.com/hailocab/go-hostpool v0.0.0-20160125115350-e80d13ce29ed // indirect
-	github.com/hashicorp/go-version v1.1.0 // indirect
 	github.com/imdario/mergo v0.3.6 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jinzhu/gorm v1.9.2 // indirect
@@ -67,7 +66,7 @@ require (
 	github.com/rs/cors v1.8.3
 	github.com/rs/zerolog v1.28.0
 	github.com/spf13/cobra v0.0.3 // indirect
-	github.com/spf13/viper v1.14.0
+	github.com/spf13/viper v1.15.0
 	github.com/stretchr/testify v1.8.1
 	github.com/theupdateframework/notary v0.6.1 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f // indirect
