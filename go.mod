@@ -1,10 +1,8 @@
 module github.com/hyperscale/hypercloud
 
 require (
-	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
 	github.com/DataDog/zstd v1.3.5 // indirect
 	github.com/Microsoft/go-winio v0.4.11 // indirect
-	github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5 // indirect
 	github.com/Sereal/Sereal v0.0.0-20190110175625-d6cf5b5efa3b // indirect
 	github.com/Shopify/logrus-bugsnag v0.0.0-20171204204709-577dee27f20d // indirect
 	github.com/agl/ed25519 v0.0.0-20170116200512-5312a6153412 // indirect
@@ -25,7 +23,7 @@ require (
 	github.com/docker/cli v0.0.0-20190121150209-01a591477c1f
 	github.com/docker/compose-on-kubernetes v0.4.18 // indirect
 	github.com/docker/distribution v2.7.1+incompatible // indirect
-	github.com/docker/docker v0.0.0-20190121204153-8d7889e51013
+	github.com/docker/docker v23.0.2+incompatible
 	github.com/docker/docker-credential-helpers v0.6.1 // indirect
 	github.com/docker/go v1.5.1-1 // indirect
 	github.com/docker/go-connections v0.4.0
@@ -58,9 +56,11 @@ require (
 	github.com/mattn/go-shellwords v1.0.3 // indirect
 	github.com/mattn/go-sqlite3 v1.10.0 // indirect
 	github.com/miekg/pkcs11 v0.0.0-20181204074848-79c216b7cb4d // indirect
+	github.com/moby/sys/sequential v0.5.0 // indirect
+	github.com/moby/term v0.0.0-20221205130635-1aeaba878587 // indirect
+	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/opencontainers/image-spec v1.0.1 // indirect
-	github.com/opencontainers/runc v0.1.1 // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/rs/cors v1.8.3
@@ -80,6 +80,7 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/vmihailenco/msgpack.v2 v2.9.1 // indirect
 	gotest.tools v2.2.0+incompatible // indirect
+	gotest.tools/v3 v3.4.0 // indirect
 	k8s.io/api v0.0.0-20181221193117-173ce66c1e39 // indirect
 	k8s.io/apimachinery v0.0.0-20190119020841-d41becfba9ee // indirect
 	k8s.io/client-go v10.0.0+incompatible // indirect
