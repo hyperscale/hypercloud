@@ -35,7 +35,7 @@ require (
 	github.com/docker/libtrust v0.0.0-20160708172513-aabc10ec26b7 // indirect
 	github.com/docker/swarmkit v0.0.0-20190117220853-0503e17893a2 // indirect
 	github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5 // indirect
-	github.com/euskadi31/go-server v0.0.0-20191009113222-686c429d32ee
+	github.com/euskadi31/go-server v1.0.0
 	github.com/euskadi31/go-service v1.4.0
 	github.com/euskadi31/go-sse v1.0.0
 	github.com/euskadi31/go-std v2.0.0-beta.1+incompatible
@@ -44,6 +44,7 @@ require (
 	github.com/gofrs/uuid v3.2.0+incompatible // indirect
 	github.com/google/certificate-transparency-go v1.0.21 // indirect
 	github.com/googleapis/gnostic v0.2.0 // indirect
+	github.com/gorilla/handlers v1.4.2 // indirect
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/schema v1.2.0
 	github.com/gregjones/httpcache v0.0.0-20181110185634-c63ab54fda8f // indirect
@@ -53,6 +54,7 @@ require (
 	github.com/jinzhu/gorm v1.9.2 // indirect
 	github.com/jinzhu/inflection v0.0.0-20180308033659-04140366298a // indirect
 	github.com/jinzhu/now v0.0.0-20181116074157-8ec929ed50c3 // indirect
+	github.com/justinas/alice v0.0.0-20171023064455-03f45bd4b7da // indirect
 	github.com/kardianos/osext v0.0.0-20170510131534-ae77be60afb1 // indirect
 	github.com/lib/pq v1.0.0 // indirect
 	github.com/mattn/go-shellwords v1.0.3 // indirect
