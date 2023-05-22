@@ -8,11 +8,10 @@ require (
 	github.com/Sereal/Sereal v0.0.0-20190110175625-d6cf5b5efa3b // indirect
 	github.com/Shopify/logrus-bugsnag v0.0.0-20171204204709-577dee27f20d // indirect
 	github.com/agl/ed25519 v0.0.0-20170116200512-5312a6153412 // indirect
-	github.com/asdine/storm v1.1.0
+	github.com/asdine/storm v2.1.2+incompatible
 	github.com/bitly/go-hostpool v0.0.0-20171023180738-a3a6125de932 // indirect
 	github.com/bitly/go-simplejson v0.5.0 // indirect
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
-	github.com/boltdb/bolt v1.3.1 // indirect
 	github.com/bugsnag/bugsnag-go v1.4.0 // indirect
 	github.com/bugsnag/panicwrap v1.2.0 // indirect
 	github.com/cenkalti/backoff v2.1.1+incompatible // indirect
@@ -69,16 +68,17 @@ require (
 	github.com/spf13/viper v1.15.0
 	github.com/stretchr/testify v1.8.3
 	github.com/theupdateframework/notary v0.6.1 // indirect
+	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
 	github.com/xeipuuv/gojsonschema v0.0.0-20160323030313-93e72a773fad // indirect
 	github.com/xlab/handysort v0.0.0-20150421192137-fb3537ed64a1 // indirect
+	go.etcd.io/bbolt v1.3.7 // indirect
 	golang.org/x/crypto v0.8.0
 	gopkg.in/dancannon/gorethink.v3 v3.0.5 // indirect
 	gopkg.in/fatih/pool.v2 v2.0.0 // indirect
 	gopkg.in/gorethink/gorethink.v3 v3.0.5 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
-	gopkg.in/vmihailenco/msgpack.v2 v2.9.1 // indirect
 	gotest.tools v2.2.0+incompatible // indirect
 	k8s.io/api v0.0.0-20181221193117-173ce66c1e39 // indirect
 	k8s.io/apimachinery v0.0.0-20190119020841-d41becfba9ee // indirect
