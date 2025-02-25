@@ -63,7 +63,7 @@ require (
 	github.com/rs/cors v1.11.1
 	github.com/rs/zerolog v1.33.0
 	github.com/spf13/cobra v0.0.3 // indirect
-	github.com/spf13/viper v1.18.2
+	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.10.0
 	github.com/theupdateframework/notary v0.6.1 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f // indirect
