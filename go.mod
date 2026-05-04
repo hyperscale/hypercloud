@@ -5,7 +5,7 @@ require (
 	github.com/coreos/go-semver v0.3.1
 	github.com/docker/cli v0.0.0-20190121150209-01a591477c1f
 	github.com/docker/docker v0.0.0-20190121204153-8d7889e51013
-	github.com/docker/go-connections v0.5.0
+	github.com/docker/go-connections v0.7.0
 	github.com/euskadi31/go-server v0.0.0-20191009113222-686c429d32ee
 	github.com/euskadi31/go-service v1.4.0
 	github.com/euskadi31/go-sse v1.0.0
@@ -23,7 +23,7 @@ require (
 require (
 	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
 	github.com/DataDog/zstd v1.3.5 // indirect
-	github.com/Microsoft/go-winio v0.4.14 // indirect
+	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5 // indirect
 	github.com/PuerkitoBio/purell v1.1.0 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
@@ -84,7 +84,6 @@ require (
 	github.com/jinzhu/inflection v0.0.0-20180308033659-04140366298a // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kardianos/osext v0.0.0-20170510131534-ae77be60afb1 // indirect
-	github.com/konsorten/go-windows-terminal-sequences v1.0.3 // indirect
 	github.com/mailru/easyjson v0.0.0-20171120080333-32fa128f234d // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
@@ -107,7 +106,7 @@ require (
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	github.com/rs/xid v1.6.0 // indirect
 	github.com/sagikazarmark/locafero v0.11.0 // indirect
-	github.com/sirupsen/logrus v1.6.0 // indirect
+	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/sourcegraph/conc v0.3.1-0.20240121214520-5f936abd7ae8 // indirect
 	github.com/spf13/afero v1.15.0 // indirect
 	github.com/spf13/cast v1.10.0 // indirect
